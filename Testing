@@ -1,4 +1,4 @@
--- VelocityDuels - FULL WORKING
+-- VelocityDuels - FIXED BUTTON COLORS
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 local Players = game:GetService("Players")
@@ -44,26 +44,6 @@ UserInput.InputChanged:Connect(function(input)
     end
 end)
 
--- ФУНКЦИЯ СОЗДАНИЯ КНОПКИ
-local function createButton(text, x, y, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 79, 0, 66)
-    btn.Position = UDim2.new(0, x, 0, y)
-    btn.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
-    btn.BackgroundTransparency = 0
-    btn.BorderSizePixel = 0
-    btn.Text = text
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 14
-    btn.Font = Enum.Font.FredokaOne
-    btn.Parent = frame
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
-    
-    btn.MouseButton1Click:Connect(callback)
-    btn.TouchTap:Connect(callback)
-    return btn
-end
-
 -- ======== ЛОГИКА ========
 local state = {autoSteal=false, infJump=false, bat1=false, bat2=false, autoLeft=false, autoRight=false}
 
@@ -71,7 +51,12 @@ local state = {autoSteal=false, infJump=false, bat1=false, bat2=false, autoLeft=
 local function getHRP() local c=LP.Character return c and c:FindFirstChild("HumanoidRootPart") end
 local function getHum() local c=LP.Character return c and c:FindFirstChildOfClass("Humanoid") end
 
--- STEAL
+local function moveToPoint(point, speed)
+    local hum = getHum()
+    if hum then hum:MoveTo(point); hum.WalkSpeed = speed end
+end
+
+-- ======== STEAL ========
 local function isMyPlotByName(name)
     local plots = workspace:FindFirstChild("Plots")
     if not plots then return false end
@@ -157,7 +142,7 @@ local function stopAutoSteal()
     if autoStealConn then autoStealConn:Disconnect(); autoStealConn = nil end
 end
 
--- AUTO LEFT
+-- ======== AUTO LEFT ========
 local L_START = Vector3.new(-474.7, -5.9, 91.0)
 local L_END = Vector3.new(-483.4, -3.9, 97.3)
 local L_BACK = Vector3.new(-474.7, -5.9, 91.0)
@@ -182,7 +167,7 @@ local function startAutoLeft()
         end
         if phase == 1 then
             if (L_START - hrp.Position).Magnitude < 2.5 then phase = 2
-            else hum:MoveTo(L_START); hum.WalkSpeed = 59 end
+            else moveToPoint(L_START, 59) end
         elseif phase == 2 then
             if (L_END - hrp.Position).Magnitude < 2.5 then
                 waitingPhase = true
@@ -193,31 +178,33 @@ local function startAutoLeft()
                 hum:MoveTo(hrp.Position)
                 local p = findStealPrompt()
                 if p then executeSteal(p) end
-            else hum:MoveTo(L_END); hum.WalkSpeed = 29 end
+            else moveToPoint(L_END, 29) end
         elseif phase == 4 then
             if (L_BACK - hrp.Position).Magnitude < 2.5 then phase = 5
-            else hum:MoveTo(L_BACK); hum.WalkSpeed = 29 end
+            else moveToPoint(L_BACK, 29) end
         elseif phase == 5 then
             if (L_RETURN - hrp.Position).Magnitude < 2.5 then phase = 6
-            else hum:MoveTo(L_RETURN); hum.WalkSpeed = 29 end
+            else moveToPoint(L_RETURN, 29) end
         elseif phase == 6 then
             if (L_FINAL - hrp.Position).Magnitude < 2.5 then
                 state.autoLeft = false
                 phase = 1
                 if leftConn then leftConn:Disconnect(); leftConn = nil end
                 hum.WalkSpeed = 59
-            else hum:MoveTo(L_FINAL); hum.WalkSpeed = 29 end
+                btnAutoLeft.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+            else moveToPoint(L_FINAL, 29) end
         end
     end)
 end
 local function stopAutoLeft()
     if leftConn then leftConn:Disconnect(); leftConn = nil end
-    waitingPhase = false; waitSide = ""
+    waitingPhase = false
+    waitSide = ""
     local hum = getHum()
     if hum then hum:MoveTo(Vector3.zero); hum.WalkSpeed = 59 end
 end
 
--- AUTO RIGHT
+-- ======== AUTO RIGHT ========
 local R_START = Vector3.new(-470.6, -5.9, 34.4)
 local R_END = Vector3.new(-484.2, -3.9, 21.4)
 local R_BACK = Vector3.new(-475.6, -5.8, 29.3)
@@ -242,7 +229,7 @@ local function startAutoRight()
         end
         if phase == 1 then
             if (R_START - hrp.Position).Magnitude < 2.5 then phase = 2
-            else hum:MoveTo(R_START); hum.WalkSpeed = 59 end
+            else moveToPoint(R_START, 59) end
         elseif phase == 2 then
             if (R_END - hrp.Position).Magnitude < 2.5 then
                 waitingPhase = true
@@ -253,31 +240,168 @@ local function startAutoRight()
                 hum:MoveTo(hrp.Position)
                 local p = findStealPrompt()
                 if p then executeSteal(p) end
-            else hum:MoveTo(R_END); hum.WalkSpeed = 29 end
+            else moveToPoint(R_END, 29) end
         elseif phase == 4 then
             if (R_BACK - hrp.Position).Magnitude < 2.5 then phase = 5
-            else hum:MoveTo(R_BACK); hum.WalkSpeed = 29 end
+            else moveToPoint(R_BACK, 29) end
         elseif phase == 5 then
             if (R_RETURN - hrp.Position).Magnitude < 2.5 then phase = 6
-            else hum:MoveTo(R_RETURN); hum.WalkSpeed = 29 end
+            else moveToPoint(R_RETURN, 29) end
         elseif phase == 6 then
             if (R_FINAL - hrp.Position).Magnitude < 2.5 then
                 state.autoRight = false
                 phase = 1
                 if rightConn then rightConn:Disconnect(); rightConn = nil end
                 hum.WalkSpeed = 59
-            else hum:MoveTo(R_FINAL); hum.WalkSpeed = 29 end
+                btnAutoRight.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+            else moveToPoint(R_FINAL, 29) end
         end
     end)
 end
 local function stopAutoRight()
     if rightConn then rightConn:Disconnect(); rightConn = nil end
-    waitingPhase = false; waitSide = ""
+    waitingPhase = false
+    waitSide = ""
     local hum = getHum()
     if hum then hum:MoveTo(Vector3.zero); hum.WalkSpeed = 59 end
 end
 
--- INFINITE JUMP
+-- ======== BAT AIMBOT ========
+local VYSE_HIT_DIST = 5
+local SWING_COOLDOWN = 0.08
+local BAT_SLAP_LIST = {"Bat","Slap","Iron Slap","Gold Slap","Diamond Slap","Emerald Slap","Ruby Slap","Dark Matter Slap","Flame Slap","Nuclear Slap","Galaxy Slap","Glitched Slap"}
+
+local function getBat()
+    local char = LP.Character
+    if not char then return nil end
+    for _,name in ipairs(BAT_SLAP_LIST) do
+        local t = char:FindFirstChild(name)
+        if t and t:IsA("Tool") then return t end
+    end
+    for _,ch in ipairs(char:GetChildren()) do
+        if ch:IsA("Tool") and ch.Name:lower():find("bat") then return ch end
+    end
+    local bp = LP:FindFirstChild("Backpack")
+    if bp then
+        for _,name in ipairs(BAT_SLAP_LIST) do
+            local t = bp:FindFirstChild(name)
+            if t and t:IsA("Tool") then
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then pcall(function() hum:EquipTool(t) end) end
+                return t
+            end
+        end
+        for _,ch in ipairs(bp:GetChildren()) do
+            if ch:IsA("Tool") and ch.Name:lower():find("bat") then
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then pcall(function() hum:EquipTool(ch) end) end
+                return ch
+            end
+        end
+    end
+    return nil
+end
+
+local hittingCooldown = false
+local function tryHitBat()
+    if hittingCooldown then return end
+    hittingCooldown = true
+    pcall(function()
+        local bat = getBat()
+        if bat then
+            pcall(function() bat:Activate() end)
+            local remote = bat:FindFirstChildWhichIsA("RemoteEvent")
+            if remote then pcall(function() remote:FireServer() end) end
+        end
+    end)
+    task.delay(SWING_COOLDOWN, function() hittingCooldown = false end)
+end
+
+local function getClosestPlayerAim()
+    local char = LP.Character
+    if not char then return nil, math.huge end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return nil, math.huge end
+    local closest, dist = nil, math.huge
+    for _,p in pairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character then
+            local tr = p.Character:FindFirstChild("HumanoidRootPart")
+            local ph = p.Character:FindFirstChildOfClass("Humanoid")
+            if tr and ph and ph.Health > 0 then
+                local d = (root.Position - tr.Position).Magnitude
+                if d < dist then dist = d; closest = p end
+            end
+        end
+    end
+    return closest, dist
+end
+
+local batConn
+local function startBatAimbot(which)
+    if batConn then batConn:Disconnect() end
+    local chaseSpeed = (which == 2) and 65 or 58
+    batConn = RunService.RenderStepped:Connect(function()
+        local isEnabled = (which == 1 and state.bat1) or (which == 2 and state.bat2)
+        if not isEnabled then return end
+        local char = LP.Character
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if not hum then return end
+        if not char:FindFirstChildOfClass("Tool") then
+            local bat = getBat()
+            if bat then pcall(function() hum:EquipTool(bat) end) end
+        end
+        local target, dist = getClosestPlayerAim()
+        if not target or not target.Character then
+            root.Velocity = Vector3.new(0, root.Velocity.Y, 0)
+            return
+        end
+        local tr = target.Character:FindFirstChild("HumanoidRootPart")
+        if not tr then return end
+        local targetVel = tr.AssemblyLinearVelocity
+        local myPos = root.Position
+        local targetPos = tr.Position
+        local predictPos = targetPos + targetVel * 0.14 + tr.CFrame.LookVector * 0.3
+        local direction = predictPos - myPos
+        local flatDir = Vector3.new(direction.X, 0, direction.Z).Unit
+        local desiredHeight = targetPos.Y + 3.7
+        local yVel = (desiredHeight - myPos.Y) * 19.5 + targetVel.Y * 0.8
+        if hum.FloorMaterial ~= Enum.Material.Air then yVel = math.max(yVel, 13) end
+        yVel = math.clamp(yVel, -70, 110)
+        local desiredVel = Vector3.new(flatDir.X * chaseSpeed, yVel, flatDir.Z * chaseSpeed)
+        root.AssemblyLinearVelocity = root.AssemblyLinearVelocity:Lerp(desiredVel, 0.8)
+
+        local speed3 = targetVel.Magnitude
+        local predictTime = math.clamp(speed3 / 150, 0.05, 0.2)
+        local predictedPos = targetPos + targetVel * predictTime
+        local toPredict = predictedPos - myPos
+        if toPredict.Magnitude > 0.1 then
+            local goalCF = CFrame.lookAt(myPos, predictedPos)
+            local curCF = root.CFrame
+            local diffCF = curCF:Inverse() * goalCF
+            local rx, ry, rz = diffCF:ToEulerAnglesXYZ()
+            rx = math.clamp(rx, -2.5, 2.5)
+            ry = math.clamp(ry, -2.5, 2.5)
+            rz = math.clamp(rz, -2.5, 2.5)
+            local tiltSpeed = 42
+            root.AssemblyAngularVelocity = root.CFrame:VectorToWorldSpace(Vector3.new(rx * tiltSpeed, ry * tiltSpeed, rz * tiltSpeed))
+        end
+        if dist <= VYSE_HIT_DIST then tryHitBat() end
+    end)
+end
+local function stopBatAimbot()
+    if batConn then batConn:Disconnect(); batConn = nil end
+    hittingCooldown = false
+    local char = LP.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if root then root.AssemblyLinearVelocity = Vector3.zero; root.AssemblyAngularVelocity = Vector3.zero end
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then hum.AutoRotate = true end
+end
+
+-- ======== INFINITE JUMP ========
 UserInput.JumpRequest:Connect(function()
     if state.infJump then
         local hrp = getHRP()
@@ -285,7 +409,7 @@ UserInput.JumpRequest:Connect(function()
     end
 end)
 
--- TP DOWN
+-- ======== TP DOWN ========
 local function teleportDown()
     local hrp = getHRP()
     if not hrp then return end
@@ -298,7 +422,7 @@ local function teleportDown()
     end
 end
 
--- DROP
+-- ======== DROP ========
 local dropActive = false
 local function doDrop()
     if dropActive then return end
@@ -326,7 +450,7 @@ local function doDrop()
     end)
 end
 
--- ANTI RAGDOLL
+-- ======== ANTI RAGDOLL ========
 RunService.Heartbeat:Connect(function()
     local char = LP.Character
     if not char then return end
@@ -347,35 +471,77 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- ======== СОЗДАЁМ КНОПКИ ========
-local btnAutoSteal = createButton("Auto Steal", 21, 98, function()
+-- ======== СОЗДАЁМ КНОПКИ (ОДИН КЛИК - БЕЗ TouchTap) ========
+local function createButton(text, x, y)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 79, 0, 66)
+    btn.Position = UDim2.new(0, x, 0, y)
+    btn.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+    btn.BackgroundTransparency = 0
+    btn.BorderSizePixel = 0
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    btn.Font = Enum.Font.FredokaOne
+    btn.Parent = frame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+    return btn
+end
+
+-- ======== ПРИВЯЗКА КНОПОК (ОТДЕЛЬНО ОТ СОЗДАНИЯ) ========
+
+-- Auto Steal
+local btnAutoSteal = createButton("Auto Steal", 21, 98)
+btnAutoSteal.MouseButton1Click:Connect(function()
     state.autoSteal = not state.autoSteal
     btnAutoSteal.BackgroundColor3 = state.autoSteal and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(47, 47, 47)
     if state.autoSteal then startAutoSteal() else stopAutoSteal() end
 end)
 
-local btnInfJump = createButton("Infinite Jump", 111, 98, function()
+-- Infinite Jump
+local btnInfJump = createButton("Infinite Jump", 111, 98)
+btnInfJump.MouseButton1Click:Connect(function()
     state.infJump = not state.infJump
     btnInfJump.BackgroundColor3 = state.infJump and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(47, 47, 47)
 end)
 
-local btnBat1 = createButton("Bat 1", 21, 176, function()
+-- Bat 1
+local btnBat1 = createButton("Bat 1", 21, 176)
+btnBat1.MouseButton1Click:Connect(function()
     state.bat1 = not state.bat1
     btnBat1.BackgroundColor3 = state.bat1 and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(47, 47, 47)
     if state.bat1 then
-        if state.bat2 then state.bat2 = false; btnBat2.BackgroundColor3 = Color3.fromRGB(47, 47, 47) end
+        if state.bat2 then
+            state.bat2 = false
+            btnBat2.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+            stopBatAimbot()
+        end
+        startBatAimbot(1)
+    else
+        if not state.bat2 then stopBatAimbot() end
     end
 end)
 
-local btnBat2 = createButton("Bat 2", 111, 176, function()
+-- Bat 2
+local btnBat2 = createButton("Bat 2", 111, 176)
+btnBat2.MouseButton1Click:Connect(function()
     state.bat2 = not state.bat2
     btnBat2.BackgroundColor3 = state.bat2 and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(47, 47, 47)
     if state.bat2 then
-        if state.bat1 then state.bat1 = false; btnBat1.BackgroundColor3 = Color3.fromRGB(47, 47, 47) end
+        if state.bat1 then
+            state.bat1 = false
+            btnBat1.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+            stopBatAimbot()
+        end
+        startBatAimbot(2)
+    else
+        if not state.bat1 then stopBatAimbot() end
     end
 end)
 
-local btnAutoLeft = createButton("Auto Left", 21, 252, function()
+-- Auto Left
+local btnAutoLeft = createButton("Auto Left", 21, 252)
+btnAutoLeft.MouseButton1Click:Connect(function()
     if state.autoRight then
         state.autoRight = false
         btnAutoRight.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
@@ -386,7 +552,9 @@ local btnAutoLeft = createButton("Auto Left", 21, 252, function()
     if state.autoLeft then startAutoLeft() else stopAutoLeft() end
 end)
 
-local btnAutoRight = createButton("Auto Right", 111, 252, function()
+-- Auto Right
+local btnAutoRight = createButton("Auto Right", 111, 252)
+btnAutoRight.MouseButton1Click:Connect(function()
     if state.autoLeft then
         state.autoLeft = false
         btnAutoLeft.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
@@ -397,8 +565,13 @@ local btnAutoRight = createButton("Auto Right", 111, 252, function()
     if state.autoRight then startAutoRight() else stopAutoRight() end
 end)
 
-local btnDrop = createButton("Drop", 111, 326, doDrop)
-local btnTPDown = createButton("TP Down", 21, 326, teleportDown)
+-- Drop
+local btnDrop = createButton("Drop", 111, 326)
+btnDrop.MouseButton1Click:Connect(doDrop)
+
+-- TP Down
+local btnTPDown = createButton("TP Down", 21, 326)
+btnTPDown.MouseButton1Click:Connect(teleportDown)
 
 -- ЛОГО
 local logo = Instance.new("ImageLabel")
@@ -409,4 +582,4 @@ logo.Image = "rbxassetid://92430047056946"
 logo.ScaleType = Enum.ScaleType.Stretch
 logo.Parent = frame
 
-print("[VelocityDuels] Loaded! GUI should appear.")
+print("[VelocityDuels] Loaded! Buttons now turn green.")
