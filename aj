@@ -18,36 +18,111 @@ local lp = Players.LocalPlayer
 --   GOOD SERVERS WITH 100M+ VALUE
 -- ════════════════════════════════════════════════════
 local GOOD_BRAINROTS = {
-    "Orcaledon",
-    "Celestial Pegasus",
-    "Hydra Dragon Cannelloni",
-    "Dragon Gingerini",
-    "La Supreme Combinasion",
-    "Cerberus",
-    "Griffin",
-    "Hydra Bunny",
-    "Blackhole Goat",
-    "Jackorilla",
+    {name = "Orcaledon", value = 250000000},
+    {name = "Celestial Pegasus", value = 500000000},
+    {name = "Hydra Dragon Cannelloni", value = 1000000000},
+    {name = "Dragon Gingerini", value = 750000000},
+    {name = "La Supreme Combinasion", value = 300000000},
+    {name = "Cerberus", value = 450000000},
+    {name = "Griffin", value = 400000000},
+    {name = "Hydra Bunny", value = 600000000},
+    {name = "Blackhole Goat", value = 800000000},
+    {name = "Jackorilla", value = 350000000},
 }
 
 -- ════════════════════════════════════════════════════
---   ALL BRAINROTS (Rotating list for logs)
+--   ALL BRAINROTS WITH VALUES (Rotating display only - NOT clickable)
 -- ════════════════════════════════════════════════════
 local allBrainrots = {
-    "Orcaledon","Celestial Pegasus","Hydra Dragon Cannelloni","Dragon Gingerini","La Supreme Combinasion",
-    "Cerberus","Griffin","Hydra Bunny","Blackhole Goat","Jackorilla","Los Nooo My Hotspotsitos",
-    "Serafinna Medusella","La Grande Combinassion","La Easter Grande","Rang Ring Bus","Guest 666",
-    "Los Mi Gatitos","Los Chicleteiras","Noo My Eggs","67","Donkeyturbo Express","Mariachi Corazoni",
-    "Los Burritos","Los 25","Tacorillo Crocodillo","Swag Soda","Noo my Heart","Chimnino","Los Combinasionas",
-    "Chicleteira Noelteira","Fishino Clownino","Baskito","Tacorita Bicicleta","Los Sweethearts",
-    "Spinny Hammy","Nuclearo Dinosauro","Las Sis","DJ Panda","Chicleteira Cupideira","La Karkerkar Combinasion",
-    "Chillin Chili","Chipso and Queso","Money Money Reindeer","Money Money Puggy","Churrito Bunnito",
-    "Celularcini Viciosini","Los Planitos","Los Mobilis","Los 67","Mieteteira Bicicleteira","Tuff Toucan",
-    "La Spooky Grande","Los Spooky Combinasionas","Cigno Fulgoro","Los Candies","Los Hotspositos",
-    "Los Jolly Combinasionas","Los Cupids","Los Puggies","W or L","Tralalalaledon","La Extinct Grande Combinasion",
-    "Tralaledon","La Jolly Grande","Los Primos","Bacuru and Egguru","Eviledon","Los Tacoritas","Lovin Rose",
-    "Tang Tang Kelentang","Ketupat Kepat","Los Bros","Tictac Sahur","La Romantic Grande","Gingerat Gerat",
+    {name = "Orcaledon", value = 250000000},
+    {name = "Celestial Pegasus", value = 500000000},
+    {name = "Hydra Dragon Cannelloni", value = 1000000000},
+    {name = "Dragon Gingerini", value = 750000000},
+    {name = "La Supreme Combinasion", value = 300000000},
+    {name = "Cerberus", value = 450000000},
+    {name = "Griffin", value = 400000000},
+    {name = "Hydra Bunny", value = 600000000},
+    {name = "Blackhole Goat", value = 800000000},
+    {name = "Jackorilla", value = 350000000},
+    {name = "Los Nooo My Hotspotsitos", value = 15000000},
+    {name = "Serafinna Medusella", value = 12000000},
+    {name = "La Grande Combinassion", value = 25000000},
+    {name = "La Easter Grande", value = 18000000},
+    {name = "Rang Ring Bus", value = 5000000},
+    {name = "Guest 666", value = 7500000},
+    {name = "Los Mi Gatitos", value = 8000000},
+    {name = "Los Chicleteiras", value = 10000000},
+    {name = "Noo My Eggs", value = 6000000},
+    {name = "67", value = 4000000},
+    {name = "Donkeyturbo Express", value = 9000000},
+    {name = "Mariachi Corazoni", value = 11000000},
+    {name = "Los Burritos", value = 7000000},
+    {name = "Los 25", value = 3000000},
+    {name = "Tacorillo Crocodillo", value = 8500000},
+    {name = "Swag Soda", value = 5500000},
+    {name = "Noo my Heart", value = 6500000},
+    {name = "Chimnino", value = 4500000},
+    {name = "Los Combinasionas", value = 9500000},
+    {name = "Chicleteira Noelteira", value = 10500000},
+    {name = "Fishino Clownino", value = 3500000},
+    {name = "Baskito", value = 2500000},
+    {name = "Tacorita Bicicleta", value = 7500000},
+    {name = "Los Sweethearts", value = 8500000},
+    {name = "Spinny Hammy", value = 50000000},
+    {name = "Nuclearo Dinosauro", value = 40000000},
+    {name = "Las Sis", value = 20000000},
+    {name = "DJ Panda", value = 15000000},
+    {name = "Chicleteira Cupideira", value = 12000000},
+    {name = "La Karkerkar Combinasion", value = 28000000},
+    {name = "Chillin Chili", value = 8000000},
+    {name = "Chipso and Queso", value = 7000000},
+    {name = "Money Money Reindeer", value = 60000000},
+    {name = "Money Money Puggy", value = 55000000},
+    {name = "Churrito Bunnito", value = 30000000},
+    {name = "Celularcini Viciosini", value = 25000000},
+    {name = "Los Planitos", value = 18000000},
+    {name = "Los Mobilis", value = 16000000},
+    {name = "Los 67", value = 14000000},
+    {name = "Mieteteira Bicicleteira", value = 13000000},
+    {name = "Tuff Toucan", value = 22000000},
+    {name = "La Spooky Grande", value = 35000000},
+    {name = "Los Spooky Combinasionas", value = 32000000},
+    {name = "Cigno Fulgoro", value = 28000000},
+    {name = "Los Candies", value = 19000000},
+    {name = "Los Hotspositos", value = 17000000},
+    {name = "Los Jolly Combinasionas", value = 23000000},
+    {name = "Los Cupids", value = 21000000},
+    {name = "Los Puggies", value = 20000000},
+    {name = "W or L", value = 15000000},
+    {name = "Tralalalaledon", value = 45000000},
+    {name = "La Extinct Grande Combinasion", value = 55000000},
+    {name = "Tralaledon", value = 40000000},
+    {name = "La Jolly Grande", value = 38000000},
+    {name = "Los Primos", value = 25000000},
+    {name = "Bacuru and Egguru", value = 22000000},
+    {name = "Eviledon", value = 48000000},
+    {name = "Los Tacoritas", value = 26000000},
+    {name = "Lovin Rose", value = 24000000},
+    {name = "Tang Tang Kelentang", value = 18000000},
+    {name = "Ketupat Kepat", value = 16000000},
+    {name = "Los Bros", value = 14000000},
+    {name = "Tictac Sahur", value = 12000000},
+    {name = "La Romantic Grande", value = 30000000},
+    {name = "Gingerat Gerat", value = 35000000},
 }
+
+-- Helper function to format value
+local function formatValue(value)
+    if value >= 1000000000 then
+        return string.format("%.2fB", value / 1000000000)
+    elseif value >= 1000000 then
+        return string.format("%.2fM", value / 1000000)
+    elseif value >= 1000 then
+        return string.format("%.1fK", value / 1000)
+    else
+        return tostring(value)
+    end
+end
 
 -- ════════════════════════════════════════════════════
 --   BACKEND CONFIG
@@ -72,7 +147,6 @@ local CONFIG_FILE        = "JuneAutoJoiner_Config.json"
 -- ════════════════════════════════════════════════════
 local userSettings = {
     AutoJoin         = false,
-    AutoJoinRetries  = 3,
     PlaySound        = true,
     ToggleKey        = "RightShift",
 }
@@ -146,6 +220,7 @@ local T = {
     Green       = Color3.fromRGB(34, 197, 94),
     GreenDim    = Color3.fromRGB(20, 80, 40),
     Red         = Color3.fromRGB(220, 60, 70),
+    Gold        = Color3.fromRGB(255, 215, 0),
 }
 
 local ESP_GREEN = Color3.fromRGB(34, 197, 94)
@@ -402,7 +477,7 @@ local KeyHint = Instance.new("TextLabel")
 KeyHint.Size = UDim2.new(1, 0, 0, 34)
 KeyHint.Position = UDim2.new(0, 0, 1, -38)
 KeyHint.BackgroundTransparency = 1
-KeyHint.Text = userSettings.ToggleKey .. " = Toggle\nGreen Button = Join 100M+"
+KeyHint.Text = userSettings.ToggleKey .. " = Toggle\nGREEN BUTTON = Join 100M+"
 KeyHint.Font = Enum.Font.Gotham
 KeyHint.TextSize = 9
 KeyHint.TextColor3 = T.Off
@@ -593,7 +668,7 @@ local function makeKeybindSetting(parent, text)
             if input.UserInputType == Enum.UserInputType.Keyboard then
                 userSettings.ToggleKey = input.KeyCode.Name
                 kbtn.Text = input.KeyCode.Name
-                KeyHint.Text = input.KeyCode.Name .. " = Toggle\nGreen Button = Join 100M+"
+                KeyHint.Text = input.KeyCode.Name .. " = Toggle\nGREEN BUTTON = Join 100M+"
                 conn:Disconnect(); conn = nil
             end
         end)
@@ -710,7 +785,7 @@ feedLbl.TextColor3 = T.Green
 feedLbl.TextXAlignment = Enum.TextXAlignment.Left
 feedLbl.Parent = feedPill
 
--- Brainrot list scroll area
+-- Brainrot list scroll area (DISPLAY ONLY - NOT CLICKABLE)
 local Content = Instance.new("ScrollingFrame")
 Content.Size = UDim2.new(1, 0, 1, -55)
 Content.Position = UDim2.new(0, 0, 0, 52)
@@ -732,14 +807,14 @@ CLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     Content.CanvasSize = UDim2.new(0, 0, 0, CLayout.AbsoluteContentSize.Y + 10)
 end)
 
--- Current brainrot display (rotates every 5 seconds)
+-- Current brainrot display (rotates every 5 seconds - DISPLAY ONLY)
 local currentBrainrotIndex = 1
-local currentBrainrotName = allBrainrots[1]
+local currentBrainrot = allBrainrots[1]
 
--- Create the main display card with green button
+-- Create the main display card with green button (THIS IS THE ONLY JOIN METHOD)
 local function createMainBrainrotCard()
     local card = Instance.new("Frame")
-    card.Size = UDim2.new(1, 0, 0, 65)
+    card.Size = UDim2.new(1, 0, 0, 90)
     card.BackgroundColor3 = T.BgCard
     card.BorderSizePixel = 0
     Instance.new("UICorner", card).CornerRadius = UDim.new(0, 10)
@@ -747,8 +822,8 @@ local function createMainBrainrotCard()
     
     -- Green circle indicator
     local greenCircle = Instance.new("Frame")
-    greenCircle.Size = UDim2.new(0, 12, 0, 12)
-    greenCircle.Position = UDim2.new(0, 12, 0.5, -6)
+    greenCircle.Size = UDim2.new(0, 14, 0, 14)
+    greenCircle.Position = UDim2.new(0, 15, 0.5, -7)
     greenCircle.BackgroundColor3 = T.Green
     greenCircle.Parent = card
     Instance.new("UICorner", greenCircle).CornerRadius = UDim.new(1, 0)
@@ -765,64 +840,76 @@ local function createMainBrainrotCard()
     
     -- Timer text (shows countdown)
     local timerLabel = Instance.new("TextLabel")
-    timerLabel.Size = UDim2.new(0, 80, 0, 20)
-    timerLabel.Position = UDim2.new(0, 32, 0, 8)
+    timerLabel.Size = UDim2.new(0, 100, 0, 18)
+    timerLabel.Position = UDim2.new(0, 38, 0, 5)
     timerLabel.BackgroundTransparency = 1
     timerLabel.TextXAlignment = Enum.TextXAlignment.Left
-    timerLabel.Text = "Changes in: 5s"
+    timerLabel.Text = "Next in: 5s"
     timerLabel.Font = Enum.Font.Gotham
     timerLabel.TextSize = 9
     timerLabel.TextColor3 = T.TextDim
     timerLabel.Parent = card
     
-    -- Brainrot name
+    -- "CURRENT BRAINROT" label
+    local currentLabel = Instance.new("TextLabel")
+    currentLabel.Size = UDim2.new(1, -180, 0, 16)
+    currentLabel.Position = UDim2.new(0, 38, 0, 25)
+    currentLabel.BackgroundTransparency = 1
+    currentLabel.TextXAlignment = Enum.TextXAlignment.Left
+    currentLabel.Text = "🔥 CURRENT BRAINROT"
+    currentLabel.Font = Enum.Font.GothamBold
+    currentLabel.TextSize = 9
+    currentLabel.TextColor3 = T.Accent2
+    currentLabel.Parent = card
+    
+    -- VALUE LABEL (ON TOP OF BRAINROT NAME)
+    local valueLabel = Instance.new("TextLabel")
+    valueLabel.Size = UDim2.new(1, -180, 0, 20)
+    valueLabel.Position = UDim2.new(0, 38, 0, 42)
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.TextXAlignment = Enum.TextXAlignment.Left
+    valueLabel.Text = "💰 " .. formatValue(currentBrainrot.value)
+    valueLabel.Font = Enum.Font.GothamBold
+    valueLabel.TextSize = 14
+    valueLabel.TextColor3 = T.Gold
+    valueLabel.Parent = card
+    
+    -- Brainrot name (DISPLAY ONLY - BELOW THE VALUE)
     local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, -170, 0, 28)
-    nameLabel.Position = UDim2.new(0, 32, 0, 24)
+    nameLabel.Size = UDim2.new(1, -180, 0, 24)
+    nameLabel.Position = UDim2.new(0, 38, 0, 62)
     nameLabel.BackgroundTransparency = 1
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-    nameLabel.Text = currentBrainrotName
+    nameLabel.Text = currentBrainrot.name
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextSize = 16
-    nameLabel.TextColor3 = T.Accent2
+    nameLabel.TextColor3 = T.White
     nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
     nameLabel.Parent = card
     
-    -- Value label
-    local valueLabel = Instance.new("TextLabel")
-    valueLabel.Size = UDim2.new(0, 100, 0, 16)
-    valueLabel.Position = UDim2.new(0, 32, 0, 48)
-    valueLabel.BackgroundTransparency = 1
-    valueLabel.TextXAlignment = Enum.TextXAlignment.Left
-    valueLabel.Text = "💰 100M+ Value"
-    valueLabel.Font = Enum.Font.Gotham
-    valueLabel.TextSize = 10
-    valueLabel.TextColor3 = T.Green
-    valueLabel.Parent = card
-    
-    -- Green JOIN button
+    -- GREEN JOIN BUTTON (THIS IS THE ONLY WAY TO JOIN)
     local joinButton = Instance.new("TextButton")
-    joinButton.Size = UDim2.new(0, 110, 0, 42)
-    joinButton.Position = UDim2.new(1, -125, 0.5, -21)
+    joinButton.Size = UDim2.new(0, 120, 0, 50)
+    joinButton.Position = UDim2.new(1, -135, 0.5, -25)
     joinButton.BackgroundColor3 = T.Green
     joinButton.Text = "▶ JOIN NOW"
     joinButton.Font = Enum.Font.GothamBold
-    joinButton.TextSize = 14
+    joinButton.TextSize = 16
     joinButton.TextColor3 = T.White
     joinButton.Parent = card
-    Instance.new("UICorner", joinButton).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", joinButton).CornerRadius = UDim.new(0, 10)
     
     -- Button hover effect
     joinButton.MouseEnter:Connect(function()
         TweenService:Create(joinButton, TweenInfo.new(0.15), {BackgroundColor3 = T.Accent2}):Play()
-        TweenService:Create(joinButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 115, 0, 44)}):Play()
+        TweenService:Create(joinButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 126, 0, 54)}):Play()
     end)
     joinButton.MouseLeave:Connect(function()
         TweenService:Create(joinButton, TweenInfo.new(0.15), {BackgroundColor3 = T.Green}):Play()
-        TweenService:Create(joinButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 110, 0, 42)}):Play()
+        TweenService:Create(joinButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 120, 0, 50)}):Play()
     end)
     
-    -- Join function
+    -- Join function (ONLY HERE)
     local currentlyJoining = false
     joinButton.MouseButton1Click:Connect(function()
         if currentlyJoining then return end
@@ -844,25 +931,19 @@ local function createMainBrainrotCard()
         end)
     end)
     
-    -- Update function for brainrot name
-    local function updateBrainrot(newName)
-        currentBrainrotName = newName
-        nameLabel.Text = newName
+    -- Update function for brainrot (DISPLAY ONLY)
+    local function updateBrainrot(newBrainrot)
+        currentBrainrot = newBrainrot
+        nameLabel.Text = newBrainrot.name
+        valueLabel.Text = "💰 " .. formatValue(newBrainrot.value)
         
-        -- Check if it's a 100M+ brainrot
-        local isGood = false
-        for _, good in ipairs(GOOD_BRAINROTS) do
-            if newName == good then
-                isGood = true
-                break
-            end
-        end
-        
-        if isGood then
-            valueLabel.Text = "💎 100M+ ULTRA RARE"
-            valueLabel.TextColor3 = T.Gold or T.Accent2
+        -- Color based on value
+        if newBrainrot.value >= 1000000000 then
+            valueLabel.TextColor3 = T.Gold
+            valueLabel.Text = "🏆 " .. formatValue(newBrainrot.value) .. " 💎"
+        elseif newBrainrot.value >= 500000000 then
+            valueLabel.TextColor3 = T.Accent2
         else
-            valueLabel.Text = "💰 100M+ Value"
             valueLabel.TextColor3 = T.Green
         end
     end
@@ -878,7 +959,7 @@ local function createMainBrainrotCard()
                 
                 if countdown <= 0 then
                     countdown = 5
-                    -- Auto join
+                    -- Auto join using the join button
                     if not currentlyJoining then
                         currentlyJoining = true
                         joinButton.Text = "JOINING..."
@@ -897,7 +978,7 @@ local function createMainBrainrotCard()
                         end)
                     end
                     
-                    -- Rotate to next brainrot
+                    -- Rotate to next brainrot (DISPLAY ONLY)
                     currentBrainrotIndex = currentBrainrotIndex % #allBrainrots + 1
                     updateBrainrot(allBrainrots[currentBrainrotIndex])
                 end
@@ -909,7 +990,7 @@ local function createMainBrainrotCard()
         end
     end)
     
-    -- Rotate brainrot every 5 seconds regardless of auto-join
+    -- Rotate brainrot every 5 seconds (DISPLAY ONLY - NOT JOINING)
     task.spawn(function()
         while card and card.Parent do
             task.wait(5)
@@ -923,82 +1004,65 @@ local function createMainBrainrotCard()
     return card, updateBrainrot
 end
 
--- Create the main brainrot display
+-- Create the main brainrot display (THIS IS THE ONLY JOIN BUTTON)
 local mainCard, updateMainBrainrot = createMainBrainrotCard()
 
--- Also show additional good brainrots below
-local function createGoodBrainrotItem(name)
+-- Add a separator
+local separator = Instance.new("Frame")
+separator.Size = UDim2.new(1, 0, 0, 2)
+separator.BackgroundColor3 = T.BgCard
+separator.Parent = Content
+
+-- "RECOMMENDED" label
+local recLabel = Instance.new("TextLabel")
+recLabel.Size = UDim2.new(1, 0, 0, 24)
+recLabel.BackgroundTransparency = 1
+recLabel.Text = "── RECOMMENDED 100M+ BRAINROTS ──"
+recLabel.Font = Enum.Font.GothamBold
+recLabel.TextSize = 11
+recLabel.TextColor3 = T.Green
+recLabel.Parent = Content
+
+-- Display good brainrots (DISPLAY ONLY - NOT CLICKABLE)
+for _, brainrot in ipairs(GOOD_BRAINROTS) do
     local card = Instance.new("Frame")
-    card.Size = UDim2.new(1, 0, 0, 48)
+    card.Size = UDim2.new(1, 0, 0, 50)
     card.BackgroundColor3 = T.BgCardHover
     card.BorderSizePixel = 0
-    Instance.new("UICorner", card).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", card).CornerRadius = UDim.new(0, 6)
     card.Parent = Content
     
     local greenCircle = Instance.new("Frame")
-    greenCircle.Size = UDim2.new(0, 10, 0, 10)
-    greenCircle.Position = UDim2.new(0, 12, 0.5, -5)
+    greenCircle.Size = UDim2.new(0, 8, 0, 8)
+    greenCircle.Position = UDim2.new(0, 15, 0.5, -4)
     greenCircle.BackgroundColor3 = T.Green
     greenCircle.Parent = card
     Instance.new("UICorner", greenCircle).CornerRadius = UDim.new(1, 0)
     
+    local valueLabel = Instance.new("TextLabel")
+    valueLabel.Size = UDim2.new(1, -30, 0, 16)
+    valueLabel.Position = UDim2.new(0, 35, 0, 6)
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.TextXAlignment = Enum.TextXAlignment.Left
+    valueLabel.Text = "💰 " .. formatValue(brainrot.value)
+    valueLabel.Font = Enum.Font.GothamBold
+    valueLabel.TextSize = 11
+    valueLabel.TextColor3 = T.Gold
+    valueLabel.Parent = card
+    
     local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, -130, 1, 0)
-    nameLabel.Position = UDim2.new(0, 30, 0, 0)
+    nameLabel.Size = UDim2.new(1, -30, 0, 20)
+    nameLabel.Position = UDim2.new(0, 35, 0, 24)
     nameLabel.BackgroundTransparency = 1
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-    nameLabel.Text = name
+    nameLabel.Text = brainrot.name
     nameLabel.Font = Enum.Font.GothamSemibold
     nameLabel.TextSize = 12
     nameLabel.TextColor3 = T.White
     nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
     nameLabel.Parent = card
     
-    local joinSmall = Instance.new("TextButton")
-    joinSmall.Size = UDim2.new(0, 90, 0, 32)
-    joinSmall.Position = UDim2.new(1, -105, 0.5, -16)
-    joinSmall.BackgroundColor3 = T.Green
-    joinSmall.Text = "JOIN"
-    joinSmall.Font = Enum.Font.GothamBold
-    joinSmall.TextSize = 12
-    joinSmall.TextColor3 = T.White
-    joinSmall.Parent = card
-    Instance.new("UICorner", joinSmall).CornerRadius = UDim.new(0, 6)
-    
-    joinSmall.MouseEnter:Connect(function()
-        TweenService:Create(joinSmall, TweenInfo.new(0.15), {BackgroundColor3 = T.Accent2}):Play()
-    end)
-    joinSmall.MouseLeave:Connect(function()
-        TweenService:Create(joinSmall, TweenInfo.new(0.15), {BackgroundColor3 = T.Green}):Play()
-    end)
-    
-    local joining = false
-    joinSmall.MouseButton1Click:Connect(function()
-        if joining then return end
-        joining = true
-        joinSmall.Text = "JOINING..."
-        if userSettings.PlaySound then playNotifSound() end
-        pcall(function()
-            TeleportService:Teleport(game.PlaceId)
-        end)
-        task.wait(2)
-        joinSmall.Text = "JOIN"
-        joining = false
-    end)
-end
-
--- Add good brainrots list
-local goodLabel = Instance.new("TextLabel")
-goodLabel.Size = UDim2.new(1, 0, 0, 24)
-goodLabel.BackgroundTransparency = 1
-goodLabel.Text = "── 100M+ BRAINROTS ──"
-goodLabel.Font = Enum.Font.GothamBold
-goodLabel.TextSize = 11
-goodLabel.TextColor3 = T.Green
-goodLabel.Parent = Content
-
-for _, name in ipairs(GOOD_BRAINROTS) do
-    createGoodBrainrotItem(name)
+    -- Note: NO JOIN BUTTON on these - they are just for display
 end
 
 -- ESP (June Auto Joiner badge)
@@ -1078,11 +1142,11 @@ print("════════════════════════�
 print("✅ No Code Required! GUI Loaded!")
 print("")
 print("📱 HOW TO USE:")
-print("   • Click the GREEN JOIN button to join a 100M+ server")
+print("   • Click the BIG GREEN JOIN BUTTON to join a 100M+ server")
 print("   • Toggle AUTO JOINER for automatic joining every 5s")
-print("   • Brainrot changes every 5 seconds")
-print("   • Drag the green button to reposition")
+print("   • Value is shown ABOVE the brainrot name")
+print("   • Brainrot changes every 5 seconds (DISPLAY ONLY)")
 print("")
 print("📋 100M+ Brainrots Available: " .. #GOOD_BRAINROTS)
-print("📋 Total Brainrots: " .. #allBrainrots)
+print("📋 Total Brainrots in rotation: " .. #allBrainrots)
 print("═══════════════════════════════════════════════════════════")
