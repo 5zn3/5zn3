@@ -1,29 +1,26 @@
--- ============================================================
--- autoplay GUI + AUTO LEFT / AUTO RIGHT (один проход)
--- ПРИНУДИТЕЛЬНАЯ СКОРОСТЬ (берётся из WalkSpeed)
--- DRAGABLE для телефонов и ПК
--- ============================================================
+--[=[
+ d888b  db    db d888888b      .d888b.      db      db    db  .d8b.  
+88' Y8b 88    88   `88'        VP  `8D      88      88    88 d8' `8b 
+88      88    88    88            odD'      88      88    88 88ooo88 
+88  ooo 88    88    88          .88'        88      88    88 88~~~88 
+88. ~8~ 88b  d88   .88.        j88.         88booo. 88b  d88 88   88    @uniquadev
+ Y888P  ~Y8888P' Y888888P      888888D      Y88888P ~Y8888P' YP   YP  CONVERTER 
+]=]
 
-if not game:IsLoaded() then game.Loaded:Wait() end
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local LP = Players.LocalPlayer
-
--- ======== ТВОЙ GUI ========
 local G2L = {};
-G2L["1"] = Instance.new("ScreenGui", LP:WaitForChild("PlayerGui"));
-G2L["1"]["Name"] = "autoplay";
+
+G2L["1"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"));
+G2L["1"]["Name"] = "cn";
 G2L["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling;
 
 G2L["2"] = Instance.new("Frame", G2L["1"]);
 G2L["2"]["BorderSizePixel"] = 0;
 G2L["2"]["BackgroundColor3"] = Color3.fromRGB(112, 112, 112);
-G2L["2"]["Size"] = UDim2.new(0, 274, 0, 249);
-G2L["2"]["Position"] = UDim2.new(0.36091, 0, 0.26736, 0);
+G2L["2"]["Size"] = UDim2.new(0, 267, 0, 124);
+G2L["2"]["Position"] = UDim2.new(0.36395, 0, 0.34028, 0);
 G2L["2"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["2"]["Name"] = "root";
+G2L["2"]["ClipsDescendants"] = true;
 
 G2L["3"] = Instance.new("TextLabel", G2L["2"]);
 G2L["3"]["TextWrapped"] = true;
@@ -39,8 +36,13 @@ G2L["3"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["3"]["Text"] = "bob creations";
 G2L["3"]["Name"] = "lbl";
 G2L["3"]["Position"] = UDim2.new(0.12734, 0, 0.03279, 0);
+
 G2L["4"] = Instance.new("UIGradient", G2L["3"]);
-G2L["4"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255,255,255)),ColorSequenceKeypoint.new(0.537, Color3.fromRGB(204,204,204)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66,66,66))};
+G2L["4"]["Color"] = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(0.537, Color3.fromRGB(204, 204, 204)),
+    ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66, 66, 66))
+};
 
 G2L["5"] = Instance.new("UICorner", G2L["2"]);
 G2L["5"]["Name"] = "cnr";
@@ -50,9 +52,10 @@ G2L["6"] = Instance.new("Frame", G2L["2"]);
 G2L["6"]["BorderSizePixel"] = 0;
 G2L["6"]["BackgroundColor3"] = Color3.fromRGB(50, 50, 50);
 G2L["6"]["Size"] = UDim2.new(0, 239, 0, 87);
-G2L["6"]["Position"] = UDim2.new(0.05608, 0, 0.14739, 0);
+G2L["6"]["Position"] = UDim2.new(0.05243, 0, 0.24246, 0);
 G2L["6"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["6"]["Name"] = "left";
+G2L["6"]["Name"] = "main";
+
 G2L["7"] = Instance.new("UICorner", G2L["6"]);
 G2L["7"]["Name"] = "cnr";
 G2L["7"]["CornerRadius"] = UDim.new(0, 10);
@@ -68,18 +71,23 @@ G2L["8"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["8"]["BackgroundTransparency"] = 1;
 G2L["8"]["Size"] = UDim2.new(0, 200, 0, 22);
 G2L["8"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["8"]["Text"] = "Auto Left";
+G2L["8"]["Text"] = "Auto Type";
 G2L["8"]["Name"] = "lbl";
-G2L["8"]["Position"] = UDim2.new(0.06876, 0, 0.14773, 0);
+G2L["8"]["Position"] = UDim2.new(0.07713, 0, 0.12474, 0);
+
 G2L["9"] = Instance.new("UIGradient", G2L["8"]);
-G2L["9"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255,255,255)),ColorSequenceKeypoint.new(0.537, Color3.fromRGB(204,204,204)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66,66,66))};
+G2L["9"]["Color"] = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(0.537, Color3.fromRGB(204, 204, 204)),
+    ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66, 66, 66))
+};
 
 G2L["a"] = Instance.new("TextButton", G2L["6"]);
 G2L["a"]["TextWrapped"] = true;
 G2L["a"]["BorderSizePixel"] = 0;
 G2L["a"]["TextSize"] = 14;
 G2L["a"]["TextScaled"] = true;
-G2L["a"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["a"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["a"]["BackgroundColor3"] = Color3.fromRGB(255, 0, 0);
 G2L["a"]["FontFace"] = Font.new("rbxasset://fonts/families/ComicNeueAngular.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal);
 G2L["a"]["Size"] = UDim2.new(0, 133, 0, 35);
@@ -87,336 +95,152 @@ G2L["a"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["a"]["Text"] = "OFF";
 G2L["a"]["Name"] = "button";
 G2L["a"]["Position"] = UDim2.new(0.21757, 0, 0.47126, 0);
+
 G2L["b"] = Instance.new("UICorner", G2L["a"]);
 G2L["b"]["Name"] = "cnr";
 G2L["b"]["CornerRadius"] = UDim.new(0, 50);
+
 G2L["c"] = Instance.new("UIGradient", G2L["a"]);
-G2L["c"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255,93,93)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(119,0,0))};
+G2L["c"]["Color"] = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 93, 93)),
+    ColorSequenceKeypoint.new(1.000, Color3.fromRGB(119, 0, 0))
+};
 
 G2L["d"] = Instance.new("UIGradient", G2L["6"]);
-G2L["d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255,255,255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66,66,66))};
+G2L["d"]["Color"] = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66, 66, 66))
+};
 
 G2L["e"] = Instance.new("UIGradient", G2L["2"]);
-G2L["e"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255,255,255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66,66,66))};
+G2L["e"]["Color"] = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66, 66, 66))
+};
 
-G2L["f"] = Instance.new("Frame", G2L["2"]);
-G2L["f"]["BorderSizePixel"] = 0;
-G2L["f"]["BackgroundColor3"] = Color3.fromRGB(50, 50, 50);
-G2L["f"]["Size"] = UDim2.new(0, 239, 0, 87);
-G2L["f"]["Position"] = UDim2.new(0.06338, 0, 0.56426, 0);
-G2L["f"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["f"]["Name"] = "right";
-G2L["10"] = Instance.new("UICorner", G2L["f"]);
-G2L["10"]["Name"] = "cnr";
-G2L["10"]["CornerRadius"] = UDim.new(0, 10);
+local player = game:GetService("Players").LocalPlayer
+local UserInputService = game:GetService("UserInputService")
 
-G2L["11"] = Instance.new("TextLabel", G2L["f"]);
-G2L["11"]["TextWrapped"] = true;
-G2L["11"]["BorderSizePixel"] = 0;
-G2L["11"]["TextSize"] = 14;
-G2L["11"]["TextScaled"] = true;
-G2L["11"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["11"]["FontFace"] = Font.new("rbxasset://fonts/families/ComicNeueAngular.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["11"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["11"]["BackgroundTransparency"] = 1;
-G2L["11"]["Size"] = UDim2.new(0, 200, 0, 22);
-G2L["11"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["11"]["Text"] = "Auto Right";
-G2L["11"]["Name"] = "lbl";
-G2L["11"]["Position"] = UDim2.new(0.07713, 0, 0.14773, 0);
-G2L["12"] = Instance.new("UIGradient", G2L["11"]);
-G2L["12"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255,255,255)),ColorSequenceKeypoint.new(0.537, Color3.fromRGB(204,204,204)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66,66,66))};
+local screenGui = G2L["1"]
+local mainFrame = G2L["2"]
+local toggleButton = G2L["a"]
 
-G2L["13"] = Instance.new("TextButton", G2L["f"]);
-G2L["13"]["TextWrapped"] = true;
-G2L["13"]["BorderSizePixel"] = 0;
-G2L["13"]["TextSize"] = 14;
-G2L["13"]["TextScaled"] = true;
-G2L["13"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["13"]["BackgroundColor3"] = Color3.fromRGB(255, 0, 0);
-G2L["13"]["FontFace"] = Font.new("rbxasset://fonts/families/ComicNeueAngular.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["13"]["Size"] = UDim2.new(0, 133, 0, 35);
-G2L["13"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["13"]["Text"] = "OFF";
-G2L["13"]["Name"] = "button";
-G2L["13"]["Position"] = UDim2.new(0.21757, 0, 0.47126, 0);
-G2L["14"] = Instance.new("UICorner", G2L["13"]);
-G2L["14"]["Name"] = "cnr";
-G2L["14"]["CornerRadius"] = UDim.new(0, 50);
-G2L["15"] = Instance.new("UIGradient", G2L["13"]);
-G2L["15"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255,93,93)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(119,0,0))};
+local autoTypeEnabled = false
+local lastWord = ""
 
-G2L["16"] = Instance.new("UIGradient", G2L["f"]);
-G2L["16"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255,255,255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(66,66,66))};
-
--- ======== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ========
-local function getHRP()
-    local c = LP.Character
-    return c and c:FindFirstChild("HumanoidRootPart")
-end
-
-local function getHum()
-    local c = LP.Character
-    return c and c:FindFirstChildOfClass("Humanoid")
-end
-
--- ======== ФУНКЦИЯ ДВИЖЕНИЯ С ПРИНУДИТЕЛЬНОЙ СКОРОСТЬЮ ========
-local function moveToPoint(point)
-    local hum = getHum()
-    local root = getHRP()
-    if hum and root then
-        local currentSpeed = hum.WalkSpeed  -- Берём текущую скорость
-        hum:MoveTo(point)
-        -- Принудительно задаём скорость через Velocity
-        local direction = (point - root.Position).Unit
-        if direction.Magnitude > 0 then
-            root.AssemblyLinearVelocity = Vector3.new(direction.X * currentSpeed, root.AssemblyLinearVelocity.Y, direction.Z * currentSpeed)
-        end
-    end
-end
-
--- ======== КООРДИНАТЫ ========
-local L_START = Vector3.new(-474.7, -5.9, 91.0)
-local L_END   = Vector3.new(-483.4, -3.9, 97.3)
-local L_BACK  = Vector3.new(-474.7, -5.9, 91.0)
-local L_RETURN = Vector3.new(-472.31, -7.09, 26.70)
-local L_FINAL  = Vector3.new(-482.74, -5.13, 24.12)
-
-local R_START = Vector3.new(-470.6, -5.9, 34.4)
-local R_END   = Vector3.new(-484.2, -3.9, 21.4)
-local R_BACK  = Vector3.new(-475.6, -5.8, 29.3)
-local R_RETURN = Vector3.new(-474.24, -7.09, 93.00)
-local R_FINAL  = Vector3.new(-482.57, -5.13, 94.51)
-
--- ======== СОСТОЯНИЯ ========
-local state = {
-    autoLeft = false,
-    autoRight = false,
-}
-
--- ======== ФУНКЦИЯ ОБНОВЛЕНИЯ ГРАДИЕНТА ========
-local function updateButtonGradient(btn, isOn)
-    if isOn then
-        btn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        btn.Text = "ON"
-        btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-        local grad = btn:FindFirstChild("UIGradient")
-        if grad then
-            grad.Color = ColorSequence.new{
-                ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 255, 0)),
-                ColorSequenceKeypoint.new(1.000, Color3.fromRGB(0, 200, 0))
-            }
-        end
+local function updateButton()
+    if autoTypeEnabled then
+        toggleButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        toggleButton.Text = "ON"
+        toggleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
     else
-        btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        btn.Text = "OFF"
-        btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-        local grad = btn:FindFirstChild("UIGradient")
-        if grad then
-            grad.Color = ColorSequence.new{
-                ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 93, 93)),
-                ColorSequenceKeypoint.new(1.000, Color3.fromRGB(119, 0, 0))
-            }
-        end
+        toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        toggleButton.Text = "OFF"
+        toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     end
 end
 
--- ======== AUTO LEFT ========
-local leftConn = nil
-local function startAutoLeft()
-    if leftConn then leftConn:Disconnect() end
-    local phase = 1
-    leftConn = RunService.Heartbeat:Connect(function()
-        if not state.autoLeft then return end
-        local hrp = getHRP()
-        local hum = getHum()
-        if not hrp or not hum then return end
+toggleButton.MouseButton1Click:Connect(function()
+    autoTypeEnabled = not autoTypeEnabled
+    updateButton()
+end)
 
-        if phase == 1 then
-            if (L_START - hrp.Position).Magnitude < 2.5 then
-                phase = 2
-            else
-                moveToPoint(L_START)
-            end
-        elseif phase == 2 then
-            if (L_END - hrp.Position).Magnitude < 2.5 then
-                phase = 3
-            else
-                moveToPoint(L_END)
-            end
-        elseif phase == 3 then
-            if (L_BACK - hrp.Position).Magnitude < 2.5 then
-                phase = 4
-            else
-                moveToPoint(L_BACK)
-            end
-        elseif phase == 4 then
-            if (L_RETURN - hrp.Position).Magnitude < 2.5 then
-                phase = 5
-            else
-                moveToPoint(L_RETURN)
-            end
-        elseif phase == 5 then
-            if (L_FINAL - hrp.Position).Magnitude < 2.5 then
-                state.autoLeft = false
-                phase = 1
-                if leftConn then leftConn:Disconnect(); leftConn = nil end
-                updateButtonGradient(G2L["a"], false)
-            else
-                moveToPoint(L_FINAL)
+local function typeToTextBox(text)
+    if not autoTypeEnabled then return false end
+    if not text or text == "" then return false end
+    
+    pcall(function()
+        local codes = player.PlayerGui:FindFirstChild("Codes")
+        if codes then
+            local codesFolder = codes:FindFirstChild("Codes")
+            if codesFolder then
+                local redeem = codesFolder:FindFirstChild("CodeRedeem")
+                if redeem then
+                    local textBox = redeem:FindFirstChild("TextBox")
+                    if textBox then
+                        local current = textBox.Text or ""
+                        if current == "" then
+                            textBox.Text = text
+                        elseif not string.find(current, text) then
+                            textBox.Text = current .. text
+                        end
+                    end
+                end
             end
         end
     end)
 end
 
-local function stopAutoLeft()
-    if leftConn then leftConn:Disconnect(); leftConn = nil end
-    local hum = getHum()
-    local root = getHRP()
-    if hum then hum:MoveTo(Vector3.zero) end
-    if root then root.AssemblyLinearVelocity = Vector3.zero end
-    updateButtonGradient(G2L["a"], false)
-end
-
--- ======== AUTO RIGHT ========
-local rightConn = nil
-local function startAutoRight()
-    if rightConn then rightConn:Disconnect() end
-    local phase = 1
-    rightConn = RunService.Heartbeat:Connect(function()
-        if not state.autoRight then return end
-        local hrp = getHRP()
-        local hum = getHum()
-        if not hrp or not hum then return end
-
-        if phase == 1 then
-            if (R_START - hrp.Position).Magnitude < 2.5 then
-                phase = 2
-            else
-                moveToPoint(R_START)
-            end
-        elseif phase == 2 then
-            if (R_END - hrp.Position).Magnitude < 2.5 then
-                phase = 3
-            else
-                moveToPoint(R_END)
-            end
-        elseif phase == 3 then
-            if (R_BACK - hrp.Position).Magnitude < 2.5 then
-                phase = 4
-            else
-                moveToPoint(R_BACK)
-            end
-        elseif phase == 4 then
-            if (R_RETURN - hrp.Position).Magnitude < 2.5 then
-                phase = 5
-            else
-                moveToPoint(R_RETURN)
-            end
-        elseif phase == 5 then
-            if (R_FINAL - hrp.Position).Magnitude < 2.5 then
-                state.autoRight = false
-                phase = 1
-                if rightConn then rightConn:Disconnect(); rightConn = nil end
-                updateButtonGradient(G2L["13"], false)
-            else
-                moveToPoint(R_FINAL)
+local function findNotificationText()
+    local success, result = pcall(function()
+        local target = player.PlayerGui:FindFirstChild("TopNotification")
+        if target then
+            local topNotif = target:FindFirstChild("TopNotification")
+            if topNotif then
+                local templates = {}
+                for _, child in ipairs(topNotif:GetChildren()) do
+                    if child:IsA("TextLabel") and child.Name == "Template" then
+                        table.insert(templates, child)
+                    end
+                end
+                if #templates > 0 then
+                    local lastTemplate = templates[#templates]
+                    return lastTemplate.Text
+                end
             end
         end
+        return nil
     end)
-end
-
-local function stopAutoRight()
-    if rightConn then rightConn:Disconnect(); rightConn = nil end
-    local hum = getHum()
-    local root = getHRP()
-    if hum then hum:MoveTo(Vector3.zero) end
-    if root then root.AssemblyLinearVelocity = Vector3.zero end
-    updateButtonGradient(G2L["13"], false)
-end
-
--- ======== ПРИВЯЗКА КНОПОК ========
-G2L["a"].MouseButton1Click:Connect(function()
-    if state.autoRight then
-        state.autoRight = false
-        stopAutoRight()
-        updateButtonGradient(G2L["13"], false)
+    if success and result and result ~= "" then
+        return result
     end
-    state.autoLeft = not state.autoLeft
-    if state.autoLeft then
-        startAutoLeft()
-        updateButtonGradient(G2L["a"], true)
-    else
-        stopAutoLeft()
-        updateButtonGradient(G2L["a"], false)
+    return nil
+end
+
+task.spawn(function()
+    while screenGui and screenGui.Parent do
+        task.wait(0.15)
+        local text = findNotificationText()
+        if text then
+            text = text:gsub("^%s+", ""):gsub("%s+$", "")
+            if text ~= "" and text ~= " " and text ~= "WAITING..." then
+                if text ~= lastWord then
+                    lastWord = text
+                    typeToTextBox(text)
+                end
+            end
+        end
     end
 end)
 
-G2L["13"].MouseButton1Click:Connect(function()
-    if state.autoLeft then
-        state.autoLeft = false
-        stopAutoLeft()
-        updateButtonGradient(G2L["a"], false)
-    end
-    state.autoRight = not state.autoRight
-    if state.autoRight then
-        startAutoRight()
-        updateButtonGradient(G2L["13"], true)
-    else
-        stopAutoRight()
-        updateButtonGradient(G2L["13"], false)
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
     end
 end)
 
--- ======== ДРАГАБЛ (ТЕЛЕФОНЫ + ПК) ========
-local function makeDraggable(frame)
-    local dragging = false
-    local dragStart = nil
-    local startPos = nil
+mainFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
 
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or
-           input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-        end
-    end)
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
 
-    frame.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or
-           input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or
-                         input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-end
-
-makeDraggable(G2L["2"])
-
--- ======== ЗАПУСК ПРИ ПОЯВЛЕНИИ ПЕРСОНАЖА ========
-local function onCharacterAdded(char)
-    task.wait(0.5)
-    -- Ничего не делаем со скоростью
-end
-
-if LP.Character then
-    task.wait(0.5)
-    -- Ничего не делаем со скоростью
-end
-
-LP.CharacterAdded:Connect(onCharacterAdded)
-
-print("[autoplay] Auto Left / Auto Right loaded! Using forced speed from WalkSpeed.")
+return G2L["1"], require;
