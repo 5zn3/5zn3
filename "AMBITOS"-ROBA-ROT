@@ -1,0 +1,494 @@
+-- ============================================================
+-- AMBITIOUS PVP — ПОЛНЫЙ ГУИ С ПРИВЯЗКОЙ
+-- ============================================================
+
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- ==================== СОСТОЯНИЯ ====================
+local State = {
+    speedType = "normal",
+    laggerActive = false,
+    autoBatToggled = false,
+    autoSwingEnabled = true,
+    infJumpEnabled = false,
+    antiRagdollEnabled = false,
+    fpsBoostEnabled = false,
+    autoPlayEnabled = false,
+    autoPlaySide = "right",
+    aimbotSpeed = 56.5,
+    hitboxEnabled = false,
+    darkModeEnabled = false,
+    removeAccEnabled = false,
+    autoTPDownEnabled = false,
+    jumpThreshold = 2,
+    jumpCounter = 0,
+    hardHitEnabled = false,
+    hardHitRadius = 10,
+    batRadius = 20,
+    antiLagEnabled = false,
+    ultraModeEnabled = false,
+    espEnabled = false,
+    tracerEnabled = false,
+    noCamCollisionEnabled = false,
+    aimBypassToggled = false,
+}
+
+local AutoSteal = {
+    Enabled = false,
+    Radius = 20,
+    Duration = 1.3,
+    IsStealing = false,
+    Data = {},
+    ProgressFill = nil,
+}
+
+-- ==================== СОЗДАНИЕ GUI ====================
+local function createGUI()
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "AmbitiousPVP"
+    gui.ResetOnSpawn = false
+    gui.Parent = LP:WaitForChild("PlayerGui")
+
+    -- ===== main =====
+    local main = Instance.new("Frame", gui)
+    main.Name = "main"
+    main.Size = UDim2.new(0, 643, 0, 472)
+    main.Position = UDim2.new(0.17336, 0, 0.09028, 0)
+    main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    main.BorderSizePixel = 0
+    Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+    local stroke = Instance.new("UIStroke", main)
+    stroke.Color = Color3.fromRGB(255, 0, 0)
+    stroke.Thickness = 2
+
+    -- ===== TextLabel =====
+    local title = Instance.new("TextLabel", main)
+    title.Size = UDim2.new(0, 307, 0, 31)
+    title.Position = UDim2.new(0.26208, 0, 0.01695, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "Ambitious Hub | PvP"
+    title.TextColor3 = Color3.fromRGB(255, 0, 0)
+    title.TextScaled = true
+    title.Font = Enum.Font.FredokaOne
+
+    -- ===== ФУНКЦИЯ СОЗДАНИЯ ФРЕЙМА С ПОЛЗУНКОМ =====
+    local function createToggleFrame(name, label, x, y, callback)
+        local frame = Instance.new("Frame", main)
+        frame.Name = name
+        frame.Size = UDim2.new(0, 284, 0, 41)
+        frame.Position = UDim2.new(x, 0, y, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        frame.BorderSizePixel = 0
+        Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+        local stroke2 = Instance.new("UIStroke", frame)
+        stroke2.Color = Color3.fromRGB(255, 0, 0)
+        stroke2.Thickness = 2
+
+        local lbl = Instance.new("TextLabel", frame)
+        lbl.Size = UDim2.new(0, 153, 0, 25)
+        lbl.Position = UDim2.new(0.0649, 0, 0.18768, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = label
+        lbl.TextColor3 = Color3.fromRGB(255, 0, 0)
+        lbl.TextScaled = true
+        lbl.Font = Enum.Font.FredokaOne
+
+        local slider = Instance.new("Frame", frame)
+        slider.Name = "slider"
+        slider.Size = UDim2.new(0, 63, 0, 29)
+        slider.Position = UDim2.new(0.69586, 0, 0.1389, 0)
+        slider.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        slider.BorderSizePixel = 0
+        Instance.new("UICorner", slider).CornerRadius = UDim.new(0, 22)
+        local stroke3 = Instance.new("UIStroke", slider)
+        stroke3.Color = Color3.fromRGB(255, 0, 0)
+        stroke3.Thickness = 2
+
+        local carry = Instance.new("Frame", slider)
+        carry.Name = "carry"
+        carry.Size = UDim2.new(0, 35, 0, 29)
+        carry.Position = UDim2.new(-0.00255, 0, 0.03545, 0)
+        carry.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        carry.BorderSizePixel = 0
+        Instance.new("UICorner", carry).CornerRadius = UDim.new(0, 22)
+        Instance.new("UIStroke", carry).Color = Color3.fromRGB(255, 0, 0)
+
+        local isOn = false
+        carry.MouseButton1Click:Connect(function()
+            isOn = not isOn
+            carry.BackgroundColor3 = isOn and Color3.fromRGB(50, 200, 80) or Color3.fromRGB(255, 0, 0)
+            if callback then callback(isOn) end
+        end)
+
+        return frame, carry
+    end
+
+    -- ===== СОЗДАЁМ ВСЕ ФРЕЙМЫ =====
+    local spdFrame, spdCarry = createToggleFrame("caryspizdi", "Speed / Carry", 0.01628, 0.11782, function(on)
+        State.speedType = on and "carry" or "normal"
+        print("[Ambitious] Speed mode:", State.speedType)
+    end)
+
+    local antiRagFrame, antiRagCarry = createToggleFrame("antiregdol", "Anti Ragdoll", 0.01628, 0.24494, function(on)
+        State.antiRagdollEnabled = on
+        print("[Ambitious] Anti Ragdoll:", on)
+    end)
+
+    local hitboxFrame, hitboxCarry = createToggleFrame("jotbox", "Hitbox Expander", 0.01628, 0.36994, function(on)
+        State.hitboxEnabled = on
+        print("[Ambitious] Hitbox:", on)
+    end)
+
+    local stealFrame, stealCarry = createToggleFrame("autospizdinya", "Auto Steal", 0.01628, 0.48646, function(on)
+        AutoSteal.Enabled = on
+        print("[Ambitious] Auto Steal:", on)
+    end)
+
+    local aimbot1Frame, aimbot1Carry = createToggleFrame("aimbots1", "Aimbot V1", 0.01628, 0.60087, function(on)
+        State.autoBatToggled = on
+        print("[Ambitious] Aimbot V1:", on)
+    end)
+
+    local aimbot3Frame, aimbot3Carry = createToggleFrame("aimbots3", "Aimbot V2", 0.01628, 0.71952, function(on)
+        State.aimBypassToggled = on
+        print("[Ambitious] Aimbot V2:", on)
+    end)
+
+    local tpFrame, tpCarry = createToggleFrame("tpdown", "TP Down", 0.01628, 0.84452, function(on)
+        if on then
+            local char = LP.Character
+            if char then
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if root then
+                    local rp = RaycastParams.new()
+                    rp.FilterType = Enum.RaycastFilterType.Exclude
+                    rp.FilterDescendantsInstances = {char}
+                    local rr = workspace:Raycast(root.Position, Vector3.new(0, -500, 0), rp)
+                    if rr then
+                        root.CFrame = CFrame.new(rr.Position + Vector3.new(0, 3, 0))
+                    else
+                        root.CFrame = root.CFrame * CFrame.new(0, -20, 0)
+                    end
+                end
+            end
+        end
+    end)
+
+    -- ===== ВТОРОЙ РЯД (ПРАВАЯ СТОРОНА) =====
+    local dropFrame, dropCarry = createToggleFrame("dropbaint", "Drop BR", 0.51239, 0.11782, function(on)
+        if on then
+            local char = LP.Character
+            if char then
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if root then
+                    root.Velocity = Vector3.new(root.Velocity.X, 150, root.Velocity.Z)
+                    task.delay(0.2, function()
+                        local rp = RaycastParams.new()
+                        rp.FilterType = Enum.RaycastFilterType.Exclude
+                        rp.FilterDescendantsInstances = {char}
+                        local rr = workspace:Raycast(root.Position, Vector3.new(0, -500, 0), rp)
+                        if rr then
+                            root.CFrame = CFrame.new(rr.Position + Vector3.new(0, 3, 0))
+                        end
+                    end)
+                end
+            end
+        end
+    end)
+
+    local tpBatFrame, tpBatCarry = createToggleFrame("tpbatd", "TP Bat", 0.51239, 0.24282, function(on)
+        print("[Ambitious] TP Bat:", on)
+    end)
+
+    local espFrame, espCarry = createToggleFrame("esppppppppp", "Esp Players", 0.51239, 0.36782, function(on)
+        State.espEnabled = on
+        print("[Ambitious] ESP:", on)
+    end)
+
+    -- ===== ИНФО ФРЕЙМЫ =====
+    local function createInfoFrame(name, label, x, y)
+        local frame = Instance.new("Frame", main)
+        frame.Name = name
+        frame.Size = UDim2.new(0, 284, 0, 41)
+        frame.Position = UDim2.new(x, 0, y, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        frame.BorderSizePixel = 0
+        Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+        local stroke4 = Instance.new("UIStroke", frame)
+        stroke4.Color = Color3.fromRGB(255, 0, 0)
+        stroke4.Thickness = 2
+
+        local lbl = Instance.new("TextLabel", frame)
+        lbl.Size = UDim2.new(0, 175, 0, 25)
+        lbl.Position = UDim2.new(0.18814, 0, 0.26085, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = label
+        lbl.TextColor3 = Color3.fromRGB(255, 0, 0)
+        lbl.TextScaled = true
+        lbl.Font = Enum.Font.FredokaOne
+        return frame
+    end
+
+    createInfoFrame("executornmae", "Potassium", 0.5155, 0.48646)
+    createInfoFrame("name", LP.Name, 0.51239, 0.59452)
+    createInfoFrame("discord", ".gg/ambitioushub", 0.50928, 0.70045)
+
+    print("[Ambitious] GUI создан!")
+    return gui
+end
+
+-- ==================== ФУНКЦИИ ДВИЖЕНИЯ ====================
+
+local function getCurrentSpeed()
+    return State.speedType == "normal" and 60 or 30
+end
+
+local function applySpeed()
+    local char = LP.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not root or not hum then return end
+    local md = hum.MoveDirection
+    if md.Magnitude > 0 then
+        local spd = getCurrentSpeed()
+        root.Velocity = Vector3.new(md.X * spd, root.Velocity.Y, md.Z * spd)
+    end
+end
+
+RunService.RenderStepped:Connect(applySpeed)
+
+-- ==================== INF JUMP ====================
+UIS.JumpRequest:Connect(function()
+    if not State.infJumpEnabled then return end
+    local char = LP.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if root then
+        root.Velocity = Vector3.new(root.Velocity.X, 55, root.Velocity.Z)
+    end
+end)
+
+-- ==================== ANTI RAGDOLL ====================
+local antiRagConn = nil
+local function toggleAntiRagdoll()
+    if State.antiRagdollEnabled then
+        if antiRagConn then return end
+        antiRagConn = RunService.Heartbeat:Connect(function()
+            local char = LP.Character
+            if not char then return end
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                local st = hum:GetState()
+                if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll or st == Enum.HumanoidStateType.FallingDown then
+                    hum:ChangeState(Enum.HumanoidStateType.Running)
+                end
+            end
+        end)
+    else
+        if antiRagConn then
+            antiRagConn:Disconnect()
+            antiRagConn = nil
+        end
+    end
+end
+
+-- ==================== HITBOX ====================
+local hitboxConn = nil
+local HitboxData = {}
+
+local function toggleHitbox()
+    if State.hitboxEnabled then
+        if hitboxConn then return end
+        hitboxConn = RunService.Heartbeat:Connect(function()
+            if not State.hitboxEnabled then return end
+            for _, p in pairs(Players:GetPlayers()) do
+                if p == LP then continue end
+                local char = p.Character
+                if not char then continue end
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if not root then continue end
+                local box = HitboxData[p]
+                if not box then
+                    box = Instance.new("SelectionBox")
+                    box.Name = "HitboxESP"
+                    box.Adornee = root
+                    box.Color3 = Color3.fromRGB(255, 255, 255)
+                    box.LineThickness = 0.05
+                    box.SurfaceTransparency = 0.85
+                    box.Parent = workspace
+                    HitboxData[p] = box
+                end
+                box.Visible = true
+            end
+        end)
+    else
+        if hitboxConn then
+            hitboxConn:Disconnect()
+            hitboxConn = nil
+        end
+        for _, box in pairs(HitboxData) do
+            pcall(function() box:Destroy() end)
+        end
+        HitboxData = {}
+    end
+end
+
+-- ==================== AUTO STEAL ====================
+local stealConn = nil
+
+local function startAutoSteal()
+    if stealConn then return end
+    stealConn = RunService.Heartbeat:Connect(function()
+        if not AutoSteal.Enabled or AutoSteal.IsStealing then return end
+        local char = LP.Character
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+        local prompts = workspace:GetDescendants()
+        local closest, dist = nil, math.huge
+        for _, obj in ipairs(prompts) do
+            if obj:IsA("ProximityPrompt") then
+                local parentPos = obj.Parent and obj.Parent.Position
+                if parentPos then
+                    local d = (parentPos - root.Position).Magnitude
+                    if d < dist then
+                        closest = obj
+                        dist = d
+                    end
+                end
+            end
+        end
+        if closest and dist <= AutoSteal.Radius then
+            pcall(function()
+                closest:InputHoldBegin()
+                task.wait(AutoSteal.Duration)
+                closest:InputHoldEnd()
+            end)
+        end
+    end)
+end
+
+local function stopAutoSteal()
+    if stealConn then
+        stealConn:Disconnect()
+        stealConn = nil
+    end
+    AutoSteal.IsStealing = false
+end
+
+-- ==================== АИМБОТ ====================
+local BAT_SLAP_LIST = {"Bat","Slap","Iron Slap","Gold Slap","Diamond Slap","Emerald Slap","Ruby Slap","Dark Matter Slap","Flame Slap","Nuclear Slap","Galaxy Slap","Glitched Slap"}
+local VYSE_HIT_DIST = 5
+local SWING_COOLDOWN = 0.08
+local hittingCooldown = false
+
+local function getBat()
+    local char = LP.Character
+    if not char then return nil end
+    for _, name in ipairs(BAT_SLAP_LIST) do
+        local t = char:FindFirstChild(name)
+        if t and t:IsA("Tool") then return t end
+    end
+    return nil
+end
+
+local function tryHitBat()
+    if hittingCooldown then return end
+    hittingCooldown = true
+    local bat = getBat()
+    if bat then
+        pcall(function() bat:Activate() end)
+        local remote = bat:FindFirstChildWhichIsA("RemoteEvent")
+        if remote then pcall(function() remote:FireServer() end) end
+    end
+    task.delay(SWING_COOLDOWN, function() hittingCooldown = false end)
+end
+
+local function getClosestPlayer()
+    local char = LP.Character
+    if not char then return nil, math.huge end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return nil, math.huge end
+    local closest, dist = nil, math.huge
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character then
+            local tr = p.Character:FindFirstChild("HumanoidRootPart")
+            local ph = p.Character:FindFirstChildOfClass("Humanoid")
+            if tr and ph and ph.Health > 0 then
+                local d = (root.Position - tr.Position).Magnitude
+                if d < dist then
+                    closest = p
+                    dist = d
+                end
+            end
+        end
+    end
+    return closest, dist
+end
+
+local autoBatConn = nil
+
+local function startBatAimbot()
+    if autoBatConn then return end
+    autoBatConn = RunService.RenderStepped:Connect(function()
+        if not State.autoBatToggled then return end
+        local char = LP.Character
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if not hum then return end
+        local target, dist = getClosestPlayer()
+        if not target or not target.Character then return end
+        local tr = target.Character:FindFirstChild("HumanoidRootPart")
+        if not tr then return end
+        local targetPos = tr.Position
+        local myPos = root.Position
+        local direction = (targetPos - myPos)
+        local flatDir = Vector3.new(direction.X, 0, direction.Z).Unit
+        local chaseSpeed = 58
+        local desiredHeight = targetPos.Y + 3.7
+        local yVel = (desiredHeight - myPos.Y) * 19.5
+        yVel = math.clamp(yVel, -70, 110)
+        local desiredVel = Vector3.new(flatDir.X * chaseSpeed, yVel, flatDir.Z * chaseSpeed)
+        root.AssemblyLinearVelocity = root.AssemblyLinearVelocity:Lerp(desiredVel, 0.8)
+        local toPredict = targetPos - myPos
+        if toPredict.Magnitude > 0.1 then
+            local goalCF = CFrame.lookAt(myPos, targetPos)
+            local curCF = root.CFrame
+            local diffCF = curCF:Inverse() * goalCF
+            local rx, ry, rz = diffCF:ToEulerAnglesXYZ()
+            rx = math.clamp(rx, -2.5, 2.5)
+            ry = math.clamp(ry, -2.5, 2.5)
+            rz = math.clamp(rz, -2.5, 2.5)
+            local tiltSpeed = 42
+            root.AssemblyAngularVelocity = root.CFrame:VectorToWorldSpace(Vector3.new(rx * tiltSpeed, ry * tiltSpeed, rz * tiltSpeed))
+        end
+        if dist <= VYSE_HIT_DIST and State.autoSwingEnabled then tryHitBat() end
+    end)
+end
+
+local function stopBatAimbot()
+    if autoBatConn then
+        autoBatConn:Disconnect()
+        autoBatConn = nil
+    end
+    State.autoBatToggled = false
+end
+
+-- ==================== ЗАПУСК ====================
+local gui = createGUI()
+
+-- Привязываем кастомные обработчики для кнопок
+local function findFrame(name)
+    return gui:FindFirstChild("main"):FindFirstChild(name)
+end
+
+-- Подписываемся на изменения состояния
+-- (можно расширить под свои нужды)
+
+print("[Ambitious] ГУИ загружен! Наслаждайся!")
