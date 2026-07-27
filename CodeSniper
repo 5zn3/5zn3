@@ -117,10 +117,9 @@ local function createLabel(parent, text, xPos)
 end
 
 -- ============================================
---  ФУНКЦИЯ СОЗДАНИЯ ПОЛЗУНКА (РАБОТАЕТ!)
+--  ФУНКЦИЯ СОЗДАНИЯ ПОЛЗУНКА
 -- ============================================
 local function createToggle(parent, callback)
-    -- Контейнер ползунка
     local toggleFrame = Instance.new("Frame")
     toggleFrame.Size = UDim2.new(0, 50, 0, 26)
     toggleFrame.Position = UDim2.new(0.82, 0, 0.22, 0)
@@ -129,7 +128,6 @@ local function createToggle(parent, callback)
     toggleFrame.Parent = parent
     corner(toggleFrame, UDim.new(1, 0))
     
-    -- Кружок
     local knob = Instance.new("Frame")
     knob.Size = UDim2.new(0, 22, 0, 22)
     knob.Position = UDim2.new(0, 2, 0.5, -11)
@@ -168,17 +166,14 @@ end
 -- ============================================
 --  СОЗДАНИЕ СТРОК
 -- ============================================
--- Auto Type
 local autoTypeRow = createRow(contentFrame, "autotype", 0.05029)
 local autoTypeLabel = createLabel(autoTypeRow, "Auto Type:", -0.09137)
 local autoTypeToggle, updateAutoType = createToggle(autoTypeRow)
 
--- Auto Redeem
 local autoRedeemRow = createRow(contentFrame, "redeemer", 0.27742)
 local autoRedeemLabel = createLabel(autoRedeemRow, "Auto Redeem:", -0.09137)
 local autoRedeemToggle, updateAutoRedeem = createToggle(autoRedeemRow)
 
--- Redeem After
 local redeemAfterRow = createRow(contentFrame, "redeemafter", 0.51435)
 local redeemAfterLabel = createLabel(redeemAfterRow, "Redeem After:", -0.09137)
 
@@ -195,7 +190,6 @@ redeemBox.Text = "3"
 redeemBox.Parent = redeemAfterRow
 corner(redeemBox, UDim.new(0, 5))
 
--- Converting Words
 local convertRow = createRow(contentFrame, "converter", 0.76435)
 local convertLabel = createLabel(convertRow, "Converting Words:", -0.0006)
 local convertToggle, updateConvert = createToggle(convertRow)
@@ -257,9 +251,18 @@ local function typeCode(code)
                     local textBox = codeRedeem:FindFirstChild("TextBox")
                     if textBox then
                         textBox.Text = code
+                        print("[Code Sniper] Вставлено в TextBox: " .. code)
+                    else
+                        print("[Code Sniper] TextBox не найден!")
                     end
+                else
+                    print("[Code Sniper] CodeRedeem не найден!")
                 end
+            else
+                print("[Code Sniper] Codes (внутренний) не найден!")
             end
+        else
+            print("[Code Sniper] Codes (главный) не найден!")
         end
     end)
 end
@@ -277,24 +280,46 @@ local function pressRedeem()
                     if button then
                         firesignal(button.MouseButton1Click)
                         firesignal(button.Activated)
+                        print("[Code Sniper] Нажата кнопка Redeem!")
+                    else
+                        print("[Code Sniper] Кнопка Confirm не найдена!")
                     end
+                else
+                    print("[Code Sniper] Confirm не найден!")
                 end
+            else
+                print("[Code Sniper] Codes (внутренний) не найден!")
             end
+        else
+            print("[Code Sniper] Codes (главный) не найден!")
         end
     end)
 end
 
--- Обработка уведомления
+-- ============================================
+--  СЛЕЖЕНИЕ ЗА УВЕДОМЛЕНИЯМИ (ИСПРАВЛЕНО)
+-- ============================================
 local function dispatch(text)
-    if not autoTypeEnabled then return end
-    if not text or text == "" then return end
+    print("[Code Sniper] dispatch вызван с текстом: " .. text)
+    
+    if not autoTypeEnabled then 
+        print("[Code Sniper] Auto Type выключен, пропускаем")
+        return 
+    end
+    
+    if not text or text == "" then 
+        print("[Code Sniper] Текст пустой, пропускаем")
+        return 
+    end
 
     local converted = convertText(text)
+    print("[Code Sniper] После конвертации: " .. converted)
     
     if captureCount > 0 then
         if collecting then
             table.insert(collectBuf, converted)
             collectRemain = collectRemain - 1
+            print("[Code Sniper] Сбор: " .. table.concat(collectBuf) .. " (осталось " .. collectRemain .. ")")
             if collectRemain <= 0 then
                 local result = table.concat(collectBuf)
                 if result ~= "" then
@@ -313,6 +338,7 @@ local function dispatch(text)
             collectRemain = captureCount
             table.insert(collectBuf, converted)
             collectRemain = collectRemain - 1
+            print("[Code Sniper] Начат сбор: " .. table.concat(collectBuf) .. " (осталось " .. collectRemain .. ")")
             if collectRemain <= 0 then
                 local result = table.concat(collectBuf)
                 if result ~= "" then
@@ -336,18 +362,43 @@ local function dispatch(text)
     end
 end
 
--- Слежение за уведомлениями
 local function watchNotifications()
     local target = player.PlayerGui:FindFirstChild("TopNotification")
-    if not target then return end
+    if not target then 
+        print("[Code Sniper] ❌ TopNotification не найдена!")
+        return 
+    end
     
     local topNotif = target:FindFirstChild("TopNotification")
-    if not topNotif then return end
+    if not topNotif then 
+        print("[Code Sniper] ❌ TopNotification.TopNotification не найдена!")
+        return 
+    end
     
-    topNotif.ChildAdded:Connect(function(child)
+    print("[Code Sniper] ✅ Слежение за уведомлениями запущено!")
+    
+    -- Проверяем уже существующие уведомления
+    for _, child in ipairs(topNotif:GetChildren()) do
         if child:IsA("TextLabel") and child.Name == "Template" then
-            task.wait(0.05)
+            print("[Code Sniper] 📝 Найдено существующее уведомление: " .. child.Text)
             local text = child.Text
+            if text and text ~= "" then
+                dispatch(text)
+            end
+        end
+    end
+    
+    -- Следим за новыми
+    topNotif.ChildAdded:Connect(function(child)
+        print("[Code Sniper] 🔔 Новый объект: " .. child.Name .. " (" .. child.ClassName .. ")")
+        
+        if child:IsA("TextLabel") and child.Name == "Template" then
+            -- Ждём, пока текст появится
+            task.wait(0.1)
+            
+            local text = child.Text
+            print("[Code Sniper] 📝 Текст уведомления: " .. (text or "nil"))
+            
             if text and text ~= "" then
                 dispatch(text)
             end
@@ -366,17 +417,17 @@ updateConvert(false)
 
 updateAutoType = createToggle(autoTypeRow, function(state)
     autoTypeEnabled = state
-    print("[Code Sniper] Auto Type: " .. (state and "ON" or "OFF"))
+    print("[Code Sniper] Auto Type: " .. (state and "🟢 ON" or "🔴 OFF"))
 end)
 
 updateAutoRedeem = createToggle(autoRedeemRow, function(state)
     autoRedeemEnabled = state
-    print("[Code Sniper] Auto Redeem: " .. (state and "ON" or "OFF"))
+    print("[Code Sniper] Auto Redeem: " .. (state and "🟢 ON" or "🔴 OFF"))
 end)
 
 updateConvert = createToggle(convertRow, function(state)
     convertEnabled = state
-    print("[Code Sniper] Converting Words: " .. (state and "ON" or "OFF"))
+    print("[Code Sniper] Converting Words: " .. (state and "🟢 ON" or "🔴 OFF"))
 end)
 
 -- Redeem After
@@ -427,6 +478,6 @@ titleBar.InputChanged:Connect(onInputChanged)
 mainFrame.InputBegan:Connect(onInputBegan)
 mainFrame.InputChanged:Connect(onInputChanged)
 
-print("Code Sniper loaded!")
+print("✅ Code Sniper loaded!")
 
 return G2L["1"], require;
