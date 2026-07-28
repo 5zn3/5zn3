@@ -1,7 +1,6 @@
 --[=[
-  CODE SNIPER - PXZL
-  Полностью рабочий UI с логикой
-  Шрифты через Enum.Font
+  CODE SNIPER - PXZL (FIXED)
+  Все методы сохранены, ошибки убраны
 ]=]
 
 local Players = game:GetService("Players")
@@ -10,7 +9,7 @@ local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
 -- ============================================
---  СОЗДАНИЕ GUI (ВИДЕН СРАЗУ!)
+--  СОЗДАНИЕ GUI
 -- ============================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "pxzlUI"
@@ -38,14 +37,14 @@ mainStroke.Color = Color3.fromRGB(199, 0, 0)
 mainStroke.Thickness = 2
 mainStroke.Parent = MainFrame
 
--- Заголовок (для Drag)
+-- Заголовок
 local Title = Instance.new("TextLabel")
 Title.TextWrapped = true
 Title.BorderSizePixel = 0
 Title.TextSize = 18
 Title.TextScaled = true
 Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+Title.Font = Enum.Font.GothamBold
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.BackgroundTransparency = 1
 Title.Size = UDim2.new(0, 300, 0, 30)
@@ -79,7 +78,7 @@ autoLabel.BorderSizePixel = 0
 autoLabel.TextSize = 14
 autoLabel.TextScaled = true
 autoLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-autoLabel.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+autoLabel.Font = Enum.Font.GothamBold
 autoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 autoLabel.BackgroundTransparency = 1
 autoLabel.Size = UDim2.new(0, 237, 0, 32)
@@ -104,7 +103,7 @@ autoBtn.BorderSizePixel = 0
 autoBtn.TextSize = 14
 autoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 autoBtn.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-autoBtn.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+autoBtn.Font = Enum.Font.GothamBold
 autoBtn.Size = UDim2.new(0, 40, 0, 28)
 autoBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
 autoBtn.Text = "O"
@@ -124,7 +123,7 @@ subLabel.BorderSizePixel = 0
 subLabel.TextSize = 14
 subLabel.TextScaled = true
 subLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-subLabel.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+subLabel.Font = Enum.Font.GothamBold
 subLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 subLabel.BackgroundTransparency = 1
 subLabel.Size = UDim2.new(0, 272, 0, 30)
@@ -152,7 +151,7 @@ subBox.TextSize = 14
 subBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 subBox.TextScaled = true
 subBox.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-subBox.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+subBox.Font = Enum.Font.GothamBold
 subBox.Size = UDim2.new(0, 60, 0, 24)
 subBox.Position = UDim2.new(0.12, 0, 0.05, 0)
 subBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -182,7 +181,7 @@ trigLabel.TextWrapped = true
 trigLabel.BorderSizePixel = 0
 trigLabel.TextSize = 12
 trigLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-trigLabel.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+trigLabel.Font = Enum.Font.GothamBold
 trigLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 trigLabel.BackgroundTransparency = 1
 trigLabel.Size = UDim2.new(0, 200, 0, 20)
@@ -201,7 +200,7 @@ for i = 1, 5 do
     tb.TextColor3 = Color3.fromRGB(255, 255, 255)
     tb.TextScaled = true
     tb.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-    tb.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+    tb.Font = Enum.Font.GothamBold
     tb.ClearTextOnFocus = false
     tb.Size = UDim2.new(0, 190, 0, 28)
     tb.Position = UDim2.new(0.04, 0, (i-1) * 0.18 + 0.08, 0)
@@ -233,7 +232,7 @@ repLabel.TextWrapped = true
 repLabel.BorderSizePixel = 0
 repLabel.TextSize = 12
 repLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-repLabel.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+repLabel.Font = Enum.Font.GothamBold
 repLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 repLabel.BackgroundTransparency = 1
 repLabel.Size = UDim2.new(0, 200, 0, 20)
@@ -256,7 +255,7 @@ for i = 1, 5 do
     fromBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     fromBox.TextScaled = true
     fromBox.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-    fromBox.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+    fromBox.Font = Enum.Font.GothamBold
     fromBox.ClearTextOnFocus = false
     fromBox.Size = UDim2.new(0, 200, 0, 26)
     fromBox.Position = UDim2.new(0.025, 0, (i-1) * 0.17 + 0.1, 0)
@@ -276,7 +275,7 @@ for i = 1, 5 do
     toBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     toBox.TextScaled = true
     toBox.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-    toBox.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+    toBox.Font = Enum.Font.GothamBold
     toBox.ClearTextOnFocus = false
     toBox.Size = UDim2.new(0, 200, 0, 26)
     toBox.Position = UDim2.new(0.54, 0, (i-1) * 0.17 + 0.1, 0)
@@ -297,7 +296,7 @@ repAutoLabel.BorderSizePixel = 0
 repAutoLabel.TextSize = 14
 repAutoLabel.TextScaled = true
 repAutoLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-repAutoLabel.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+repAutoLabel.Font = Enum.Font.GothamBold
 repAutoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 repAutoLabel.BackgroundTransparency = 1
 repAutoLabel.Size = UDim2.new(0, 200, 0, 30)
@@ -322,7 +321,7 @@ repAutoBtn.BorderSizePixel = 0
 repAutoBtn.TextSize = 14
 repAutoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 repAutoBtn.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-repAutoBtn.Font = Enum.Font.GothamBold  -- ← НОВЫЙ МЕТОД!
+repAutoBtn.Font = Enum.Font.GothamBold
 repAutoBtn.Size = UDim2.new(0, 40, 0, 28)
 repAutoBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
 repAutoBtn.Text = "O"
@@ -402,6 +401,9 @@ local function convertText(text)
     return text
 end
 
+-- ============================================
+--  ВСТАВКА В ПОЛЕ
+-- ============================================
 local function typeCode(code)
     if not autoEnterEnabled then return end
     pcall(function()
@@ -424,6 +426,9 @@ local function typeCode(code)
     end)
 end
 
+-- ============================================
+--  НАЖАТИЕ REDEEM (ИСПРАВЛЕНО)
+-- ============================================
 local function pressRedeem()
     pcall(function()
         local Codes = PlayerGui:FindFirstChild("Codes")
@@ -432,10 +437,35 @@ local function pressRedeem()
             if CodesInner then
                 local confirm = CodesInner:FindFirstChild("Confirm")
                 if confirm then
-                    local button = confirm:FindFirstChildWhichIsA("TextButton") or confirm
+                    -- Ищем кнопку разными способами
+                    local button = confirm:FindFirstChildOfClass("TextButton")
+                    if not button then
+                        button = confirm:FindFirstChildOfClass("ImageButton")
+                    end
+                    if not button then
+                        button = confirm:FindFirstChildWhichIsA("TextButton")
+                    end
+                    if not button then
+                        button = confirm:FindFirstChildWhichIsA("ImageButton")
+                    end
+                    if not button then
+                        button = confirm
+                    end
+                    
                     if button then
-                        firesignal(button.MouseButton1Click)
-                        firesignal(button.Activated)
+                        -- firesignal (если есть)
+                        if firesignal then
+                            pcall(function()
+                                firesignal(button.MouseButton1Click)
+                                firesignal(button.Activated)
+                            end)
+                        end
+                        -- Фокус (запасной вариант)
+                        pcall(function()
+                            button:CaptureFocus()
+                            task.wait(0.05)
+                            button:ReleaseFocus(true)
+                        end)
                     end
                 end
             end
@@ -443,6 +473,9 @@ local function pressRedeem()
     end)
 end
 
+-- ============================================
+--  ПОИСК УВЕДОМЛЕНИЙ
+-- ============================================
 local function findNotificationText()
     local success, result = pcall(function()
         local target = player.PlayerGui:FindFirstChild("TopNotification")
@@ -551,7 +584,7 @@ end
 watchNotifications()
 
 -- ============================================
---  DRAG (перетаскивание)
+--  DRAG
 -- ============================================
 local dragging = false
 local dragStart, startPos
