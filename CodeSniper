@@ -1,6 +1,6 @@
 --[=[
-  CODE SNIPER - PXZL (FIXED)
-  Все методы сохранены, ошибки убраны
+  CODE SNIPER - PXZL (ФИКС ДЛЯ МОБИЛЫ)
+  Уменьшенный размер, полная отладка
 ]=]
 
 local Players = game:GetService("Players")
@@ -9,7 +9,12 @@ local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
 -- ============================================
---  СОЗДАНИЕ GUI
+--  ВЕСЬ КОД В pcall ДЛЯ ОТЛАДКИ
+-- ============================================
+local ok, err = pcall(function()
+
+-- ============================================
+--  СОЗДАНИЕ GUI (МАЛЕНЬКОЕ ОКНО ДЛЯ МОБИЛЫ!)
 -- ============================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "pxzlUI"
@@ -18,8 +23,9 @@ ScreenGui.Parent = PlayerGui
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "pzxl"
-MainFrame.Size = UDim2.new(0, 723, 0, 370)
-MainFrame.Position = UDim2.new(0.5, -361, 0.4, -185)
+MainFrame.Size = UDim2.fromOffset(340, 380)  -- ← МАЛЕНЬКОЕ!
+MainFrame.Position = UDim2.fromScale(0.5, 0.5)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 MainFrame.BackgroundTransparency = 0.05
 MainFrame.BorderSizePixel = 0
@@ -41,369 +47,114 @@ mainStroke.Parent = MainFrame
 local Title = Instance.new("TextLabel")
 Title.TextWrapped = true
 Title.BorderSizePixel = 0
-Title.TextSize = 18
+Title.TextSize = 16
 Title.TextScaled = true
 Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.BackgroundTransparency = 1
-Title.Size = UDim2.new(0, 300, 0, 30)
+Title.Size = UDim2.new(1, -40, 0, 30)
 Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Title.Text = "Code Sniper"
 Title.Name = "Title"
 Title.Position = UDim2.new(0.02, 0, 0.005, 0)
 Title.Parent = MainFrame
 
--- Внутренняя рамка
-local Content = Instance.new("Frame")
-Content.BorderSizePixel = 0
-Content.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-Content.Size = UDim2.new(0, 707, 0, 334)
-Content.Position = UDim2.new(0.01166, 0, 0.06991, 0)
-Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Content.Name = "Content"
-Content.ClipsDescendants = true
-Content.Parent = MainFrame
+-- ============================================
+--  КНОПКИ (упрощённые, чтобы влезли)
+-- ============================================
+local function createButton(text, yPos, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.8, 0, 0, 35)
+    btn.Position = UDim2.new(0.1, 0, yPos, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 13
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = MainFrame
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = btn
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
 
-local contentCorner = Instance.new("UICorner")
-contentCorner.CornerRadius = UDim.new(0, 8)
-contentCorner.Parent = Content
+local function createLabel(text, yPos)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0.8, 0, 0, 25)
+    lbl.Position = UDim2.new(0.1, 0, yPos, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+    lbl.TextSize = 12
+    lbl.Font = Enum.Font.Gotham
+    lbl.Parent = MainFrame
+    return lbl
+end
 
 -- ============================================
---  AUTO ENTER CODE
+--  ЭЛЕМЕНТЫ UI
 -- ============================================
-local autoLabel = Instance.new("TextLabel", Content)
-autoLabel.TextWrapped = true
-autoLabel.BorderSizePixel = 0
-autoLabel.TextSize = 14
-autoLabel.TextScaled = true
-autoLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-autoLabel.Font = Enum.Font.GothamBold
-autoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-autoLabel.BackgroundTransparency = 1
-autoLabel.Size = UDim2.new(0, 237, 0, 32)
-autoLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-autoLabel.Text = "Auto Enter Code:"
-autoLabel.Name = "autoLabel"
-autoLabel.Position = UDim2.new(0.03629, 0, 0.06697, 0)
+local autoLabel = createLabel("Auto Enter: OFF", 0.12)
+local autoBtn = createButton("▶ START", 0.2, function()
+    autoEnterEnabled = not autoEnterEnabled
+    if autoEnterEnabled then
+        autoBtn.Text = "⏹ STOP"
+        autoBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        autoLabel.Text = "Auto Enter: ON"
+        autoLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    else
+        autoBtn.Text = "▶ START"
+        autoBtn.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
+        autoLabel.Text = "Auto Enter: OFF"
+        autoLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    end
+end)
 
-local autoFrame = Instance.new("Frame", Content)
-autoFrame.BorderSizePixel = 0
-autoFrame.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-autoFrame.Size = UDim2.new(0, 100, 0, 32)
-autoFrame.Position = UDim2.new(0.39159, 0, 0.06731, 0)
-autoFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-autoFrame.Name = "autoFrame"
-local autoFrameCorner = Instance.new("UICorner")
-autoFrameCorner.CornerRadius = UDim.new(1, 0)
-autoFrameCorner.Parent = autoFrame
+local subLabel = createLabel("Submit After: 3", 0.4)
+local subBtn = createButton("Change Count", 0.48, function()
+    local newCount = tonumber(subBox.Text) or 3
+    if newCount < 1 then newCount = 1 end
+    submitAfterCount = newCount
+    subLabel.Text = "Submit After: " .. newCount
+    subBox.Text = tostring(newCount)
+end)
 
-local autoBtn = Instance.new("TextButton", autoFrame)
-autoBtn.BorderSizePixel = 0
-autoBtn.TextSize = 14
-autoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-autoBtn.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-autoBtn.Font = Enum.Font.GothamBold
-autoBtn.Size = UDim2.new(0, 40, 0, 28)
-autoBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
-autoBtn.Text = "O"
-autoBtn.Name = "autoBtn"
-autoBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
-autoBtn.AutoButtonColor = false
-local autoBtnCorner = Instance.new("UICorner")
-autoBtnCorner.CornerRadius = UDim.new(1, 0)
-autoBtnCorner.Parent = autoBtn
-
--- ============================================
---  SUBMIT AFTER
--- ============================================
-local subLabel = Instance.new("TextLabel", Content)
-subLabel.TextWrapped = true
-subLabel.BorderSizePixel = 0
-subLabel.TextSize = 14
-subLabel.TextScaled = true
-subLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-subLabel.Font = Enum.Font.GothamBold
-subLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-subLabel.BackgroundTransparency = 1
-subLabel.Size = UDim2.new(0, 272, 0, 30)
-subLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-subLabel.Text = "Submit After:"
-subLabel.Name = "subLabel"
-subLabel.Position = UDim2.new(0.02534, 0, 0.2104, 0)
-
-local subFrame = Instance.new("Frame", Content)
-subFrame.BorderSizePixel = 0
-subFrame.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-subFrame.Size = UDim2.new(0, 80, 0, 28)
-subFrame.Position = UDim2.new(0.39026, 0, 0.2024, 0)
-subFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-subFrame.Name = "subFrame"
-local subFrameCorner = Instance.new("UICorner")
-subFrameCorner.CornerRadius = UDim.new(0, 6)
-subFrameCorner.Parent = subFrame
-
-local subBox = Instance.new("TextBox", subFrame)
-subBox.CursorPosition = -1
-subBox.BorderSizePixel = 0
-subBox.TextWrapped = true
-subBox.TextSize = 14
-subBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-subBox.TextScaled = true
+local subBox = Instance.new("TextBox")
+subBox.Size = UDim2.new(0.3, 0, 0, 28)
+subBox.Position = UDim2.new(0.6, 0, 0.56, 0)
 subBox.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
+subBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+subBox.TextSize = 14
 subBox.Font = Enum.Font.GothamBold
-subBox.Size = UDim2.new(0, 60, 0, 24)
-subBox.Position = UDim2.new(0.12, 0, 0.05, 0)
-subBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 subBox.Text = "3"
 subBox.TextXAlignment = Enum.TextXAlignment.Center
-subBox.Name = "subBox"
+subBox.Parent = MainFrame
 local subBoxCorner = Instance.new("UICorner")
 subBoxCorner.CornerRadius = UDim.new(0, 4)
 subBoxCorner.Parent = subBox
-
--- ============================================
---  TRIGGERS
--- ============================================
-local trigFrame = Instance.new("Frame", Content)
-trigFrame.BorderSizePixel = 0
-trigFrame.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-trigFrame.Size = UDim2.new(0, 210, 0, 223)
-trigFrame.Position = UDim2.new(0.685, 0, 0.02314, 0)
-trigFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-trigFrame.Name = "trigFrame"
-local trigFrameCorner = Instance.new("UICorner")
-trigFrameCorner.CornerRadius = UDim.new(0, 6)
-trigFrameCorner.Parent = trigFrame
-
-local trigLabel = Instance.new("TextLabel", trigFrame)
-trigLabel.TextWrapped = true
-trigLabel.BorderSizePixel = 0
-trigLabel.TextSize = 12
-trigLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-trigLabel.Font = Enum.Font.GothamBold
-trigLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-trigLabel.BackgroundTransparency = 1
-trigLabel.Size = UDim2.new(0, 200, 0, 20)
-trigLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-trigLabel.Text = "Triggers"
-trigLabel.Position = UDim2.new(0.03, 0, 0.01, 0)
-
-local triggerBoxes = {}
-local triggerTexts = {"Code is", "Redeem Code", "Last Code", "Use Code", "Enter Code"}
-for i = 1, 5 do
-    local tb = Instance.new("TextBox", trigFrame)
-    tb.CursorPosition = -1
-    tb.BorderSizePixel = 0
-    tb.TextWrapped = true
-    tb.TextSize = 12
-    tb.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tb.TextScaled = true
-    tb.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-    tb.Font = Enum.Font.GothamBold
-    tb.ClearTextOnFocus = false
-    tb.Size = UDim2.new(0, 190, 0, 28)
-    tb.Position = UDim2.new(0.04, 0, (i-1) * 0.18 + 0.08, 0)
-    tb.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    tb.Text = triggerTexts[i] or ""
-    tb.Name = "Trigger" .. i
-    local tbCorner = Instance.new("UICorner")
-    tbCorner.CornerRadius = UDim.new(0, 4)
-    tbCorner.Parent = tb
-    triggerBoxes[i] = tb
-end
-
--- ============================================
---  REPLACE
--- ============================================
-local repFrame = Instance.new("Frame", Content)
-repFrame.BorderSizePixel = 0
-repFrame.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-repFrame.Size = UDim2.new(0, 460, 0, 190)
-repFrame.Position = UDim2.new(0.01091, 0, 0.4, 0)
-repFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-repFrame.Name = "repFrame"
-local repFrameCorner = Instance.new("UICorner")
-repFrameCorner.CornerRadius = UDim.new(0, 6)
-repFrameCorner.Parent = repFrame
-
-local repLabel = Instance.new("TextLabel", repFrame)
-repLabel.TextWrapped = true
-repLabel.BorderSizePixel = 0
-repLabel.TextSize = 12
-repLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-repLabel.Font = Enum.Font.GothamBold
-repLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-repLabel.BackgroundTransparency = 1
-repLabel.Size = UDim2.new(0, 200, 0, 20)
-repLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-repLabel.Text = "Replace (from -> to)"
-repLabel.Position = UDim2.new(0.03, 0, 0.01, 0)
-
-local replaceFrom = {}
-local replaceTo = {}
-local fromTexts = {"2nd Mutation", "My Name", "My Age", "Fav color", "Current Month"}
-local toTexts = {"Candy", "Sammy", "24", "Blue", "August"}
-
-for i = 1, 5 do
-    local fromBox = Instance.new("TextBox", repFrame)
-    fromBox.CursorPosition = -1
-    fromBox.Name = "from" .. i
-    fromBox.BorderSizePixel = 0
-    fromBox.TextWrapped = true
-    fromBox.TextSize = 12
-    fromBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    fromBox.TextScaled = true
-    fromBox.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-    fromBox.Font = Enum.Font.GothamBold
-    fromBox.ClearTextOnFocus = false
-    fromBox.Size = UDim2.new(0, 200, 0, 26)
-    fromBox.Position = UDim2.new(0.025, 0, (i-1) * 0.17 + 0.1, 0)
-    fromBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    fromBox.Text = fromTexts[i] or ""
-    local fromCorner = Instance.new("UICorner")
-    fromCorner.CornerRadius = UDim.new(0, 4)
-    fromCorner.Parent = fromBox
-    replaceFrom[i] = fromBox
-    
-    local toBox = Instance.new("TextBox", repFrame)
-    toBox.CursorPosition = -1
-    toBox.Name = "to" .. i
-    toBox.BorderSizePixel = 0
-    toBox.TextWrapped = true
-    toBox.TextSize = 12
-    toBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toBox.TextScaled = true
-    toBox.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-    toBox.Font = Enum.Font.GothamBold
-    toBox.ClearTextOnFocus = false
-    toBox.Size = UDim2.new(0, 200, 0, 26)
-    toBox.Position = UDim2.new(0.54, 0, (i-1) * 0.17 + 0.1, 0)
-    toBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    toBox.Text = toTexts[i] or ""
-    local toCorner = Instance.new("UICorner")
-    toCorner.CornerRadius = UDim.new(0, 4)
-    toCorner.Parent = toBox
-    replaceTo[i] = toBox
-end
-
--- ============================================
---  AUTO REPLACE
--- ============================================
-local repAutoLabel = Instance.new("TextLabel", Content)
-repAutoLabel.TextWrapped = true
-repAutoLabel.BorderSizePixel = 0
-repAutoLabel.TextSize = 14
-repAutoLabel.TextScaled = true
-repAutoLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-repAutoLabel.Font = Enum.Font.GothamBold
-repAutoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-repAutoLabel.BackgroundTransparency = 1
-repAutoLabel.Size = UDim2.new(0, 200, 0, 30)
-repAutoLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-repAutoLabel.Text = "Auto Replace:"
-repAutoLabel.Name = "repAutoLabel"
-repAutoLabel.Position = UDim2.new(0.685, 0, 0.74, 0)
-
-local repAutoFrame = Instance.new("Frame", Content)
-repAutoFrame.BorderSizePixel = 0
-repAutoFrame.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-repAutoFrame.Size = UDim2.new(0, 100, 0, 32)
-repAutoFrame.Position = UDim2.new(0.78, 0, 0.82779, 0)
-repAutoFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-repAutoFrame.Name = "repAutoFrame"
-local repAutoCorner = Instance.new("UICorner")
-repAutoCorner.CornerRadius = UDim.new(1, 0)
-repAutoCorner.Parent = repAutoFrame
-
-local repAutoBtn = Instance.new("TextButton", repAutoFrame)
-repAutoBtn.BorderSizePixel = 0
-repAutoBtn.TextSize = 14
-repAutoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-repAutoBtn.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-repAutoBtn.Font = Enum.Font.GothamBold
-repAutoBtn.Size = UDim2.new(0, 40, 0, 28)
-repAutoBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
-repAutoBtn.Text = "O"
-repAutoBtn.Name = "repAutoBtn"
-repAutoBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
-repAutoBtn.AutoButtonColor = false
-local repAutoBtnCorner = Instance.new("UICorner")
-repAutoBtnCorner.CornerRadius = UDim.new(1, 0)
-repAutoBtnCorner.Parent = repAutoBtn
-
--- ============================================
---  ЛОГИКА
--- ============================================
-local autoEnterEnabled = false
-local autoReplaceEnabled = false
-local submitAfterCount = 3
-
-local function updateSlider(btn, state)
-    if state then
-        btn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-        btn.Text = "O"
-    else
-        btn.BackgroundColor3 = Color3.fromRGB(199, 0, 0)
-        btn.Text = "O"
-    end
-end
-
-autoBtn.MouseButton1Click:Connect(function()
-    autoEnterEnabled = not autoEnterEnabled
-    updateSlider(autoBtn, autoEnterEnabled)
-end)
-
-repAutoBtn.MouseButton1Click:Connect(function()
-    autoReplaceEnabled = not autoReplaceEnabled
-    updateSlider(repAutoBtn, autoReplaceEnabled)
-end)
 
 subBox.FocusLost:Connect(function()
     local n = tonumber(subBox.Text) or 3
     if n < 1 then n = 1 end
     submitAfterCount = n
     subBox.Text = tostring(n)
+    subLabel.Text = "Submit After: " .. n
 end)
 
-local function getTriggers()
-    local triggers = {}
-    for i = 1, 5 do
-        local box = triggerBoxes[i]
-        if box and box.Text and box.Text ~= "" then
-            table.insert(triggers, box.Text:lower())
-        end
-    end
-    return triggers
-end
-
-local function getReplaceRules()
-    local rules = {}
-    for i = 1, 5 do
-        local from = replaceFrom[i]
-        local to = replaceTo[i]
-        if from and to and from.Text ~= "" and to.Text ~= "" then
-            rules[from.Text:lower()] = to.Text
-        end
-    end
-    return rules
-end
-
-local function convertText(text)
-    if not autoReplaceEnabled then return text end
-    local rules = getReplaceRules()
-    local lowerText = text:lower()
-    for trigger, replacement in pairs(rules) do
-        if lowerText:find(trigger:lower(), 1, true) then
-            return replacement
-        end
-    end
-    return text
-end
+local statusLabel = createLabel("Status: Waiting...", 0.7)
 
 -- ============================================
---  ВСТАВКА В ПОЛЕ
+--  ЛОГИКА
 -- ============================================
+local autoEnterEnabled = false
+local submitAfterCount = 3
+local collecting = false
+local collectBuf = {}
+local collectRemain = 0
+local lastText = ""
+
 local function typeCode(code)
     if not autoEnterEnabled then return end
     pcall(function()
@@ -419,6 +170,7 @@ local function typeCode(code)
                         textBox:CaptureFocus()
                         textBox:ReleaseFocus(true)
                         textBox.CursorPosition = #code
+                        statusLabel.Text = "✅ Inserted: " .. code
                     end
                 end
             end
@@ -426,9 +178,6 @@ local function typeCode(code)
     end)
 end
 
--- ============================================
---  НАЖАТИЕ REDEEM (ИСПРАВЛЕНО)
--- ============================================
 local function pressRedeem()
     pcall(function()
         local Codes = PlayerGui:FindFirstChild("Codes")
@@ -437,7 +186,6 @@ local function pressRedeem()
             if CodesInner then
                 local confirm = CodesInner:FindFirstChild("Confirm")
                 if confirm then
-                    -- Ищем кнопку разными способами
                     local button = confirm:FindFirstChildOfClass("TextButton")
                     if not button then
                         button = confirm:FindFirstChildOfClass("ImageButton")
@@ -446,97 +194,44 @@ local function pressRedeem()
                         button = confirm:FindFirstChildWhichIsA("TextButton")
                     end
                     if not button then
-                        button = confirm:FindFirstChildWhichIsA("ImageButton")
-                    end
-                    if not button then
                         button = confirm
                     end
-                    
                     if button then
-                        -- firesignal (если есть)
                         if firesignal then
                             pcall(function()
                                 firesignal(button.MouseButton1Click)
                                 firesignal(button.Activated)
                             end)
                         end
-                        -- Фокус (запасной вариант)
                         pcall(function()
                             button:CaptureFocus()
                             task.wait(0.05)
                             button:ReleaseFocus(true)
                         end)
+                        statusLabel.Text = "✅ Redeem pressed"
                     end
                 end
             end
         end
     end)
 end
-
--- ============================================
---  ПОИСК УВЕДОМЛЕНИЙ
--- ============================================
-local function findNotificationText()
-    local success, result = pcall(function()
-        local target = player.PlayerGui:FindFirstChild("TopNotification")
-        if target then
-            local topNotif = target:FindFirstChild("TopNotification")
-            if topNotif then
-                for _, child in ipairs(topNotif:GetChildren()) do
-                    if child:IsA("TextLabel") and child.Name == "Template" then
-                        return child.Text
-                    end
-                end
-            end
-        end
-        return nil
-    end)
-    if success and result and result ~= "" then
-        return result
-    end
-    return nil
-end
-
--- ============================================
---  ОБРАБОТКА УВЕДОМЛЕНИЙ
--- ============================================
-local collecting = false
-local collectBuf = {}
-local collectRemain = 0
-local lastText = ""
 
 local function dispatch(text)
     if not autoEnterEnabled then return end
     if not text or text == "" then return end
     if text == lastText then return end
     lastText = text
+    statusLabel.Text = "📩 Received: " .. text
 
-    local triggers = getTriggers()
-    local matched = #triggers == 0
-    if not matched then
-        local lowerText = text:lower()
-        for _, trigger in ipairs(triggers) do
-            if lowerText:find(trigger, 1, true) then
-                matched = true
-                break
-            end
-        end
-    end
-    if not matched then return end
-
-    local converted = convertText(text)
-    
     if submitAfterCount > 1 then
         if collecting then
-            table.insert(collectBuf, converted)
+            table.insert(collectBuf, text)
             collectRemain = collectRemain - 1
             if collectRemain <= 0 then
                 local result = table.concat(collectBuf, "")
-                if result ~= "" then
-                    typeCode(result)
-                    task.wait(0.3)
-                    pressRedeem()
-                end
+                typeCode(result)
+                task.wait(0.3)
+                pressRedeem()
                 collecting = false
                 collectBuf = {}
                 collectRemain = 0
@@ -545,22 +240,20 @@ local function dispatch(text)
             collecting = true
             collectBuf = {}
             collectRemain = submitAfterCount
-            table.insert(collectBuf, converted)
+            table.insert(collectBuf, text)
             collectRemain = collectRemain - 1
             if collectRemain <= 0 then
                 local result = table.concat(collectBuf, "")
-                if result ~= "" then
-                    typeCode(result)
-                    task.wait(0.3)
-                    pressRedeem()
-                end
+                typeCode(result)
+                task.wait(0.3)
+                pressRedeem()
                 collecting = false
                 collectBuf = {}
                 collectRemain = 0
             end
         end
     else
-        typeCode(converted)
+        typeCode(text)
         task.wait(0.3)
         pressRedeem()
     end
@@ -568,9 +261,17 @@ end
 
 local function watchNotifications()
     local target = player.PlayerGui:FindFirstChild("TopNotification")
-    if not target then return
+    if not target then
+        statusLabel.Text = "❌ TopNotification not found"
+        return
+    end
     local topNotif = target:FindFirstChild("TopNotification")
-    if not topNotif then return
+    if not topNotif then
+        statusLabel.Text = "❌ TopNotification.TopNotification not found"
+        return
+    end
+    statusLabel.Text = "👀 Watching for codes..."
+
     topNotif.ChildAdded:Connect(function(child)
         if child:IsA("TextLabel") and child.Name == "Template" then
             task.wait(0.05)
@@ -581,6 +282,7 @@ local function watchNotifications()
         end
     end)
 end
+
 watchNotifications()
 
 -- ============================================
@@ -612,4 +314,11 @@ UserInputService.InputChanged:Connect(function(input)
     )
 end)
 
-print("Code Sniper loaded")
+print("✅ Code Sniper loaded!")
+
+end) -- pcall
+
+if not ok then
+    warn("❌ Ошибка в скрипте: " .. tostring(err))
+    print("❌ Ошибка: " .. tostring(err))
+end
