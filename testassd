@@ -10,6 +10,7 @@ local CONFIG = {
     Names = {
         ScreenGui  = "TRUBL",
         MainFrame  = "IslandDropDown",
+        BtnGui     = "TrublCircleBtns",
     },
     Colors = {
         Background  = Color3.fromRGB(18, 25, 35),
@@ -24,11 +25,15 @@ local CONFIG = {
         ActiveMode  = Color3.fromRGB(0, 150, 255),
         InactiveMode= Color3.fromRGB(0, 60, 100),
         ProgressFill= Color3.fromRGB(0, 180, 255),
+        BtnActive   = Color3.fromRGB(0, 100, 200),
+        BtnInactive = Color3.fromRGB(18, 25, 35),
+        KillColor   = Color3.fromRGB(255, 220, 50),
     },
     Size = {
         MainFrame   = UDim2.new(0, 300, 0, 500),
         RowHeight   = 40,
         SubPanelH   = 44,
+        BtnSize     = 80,
     },
     Position = {
         MainFrame   = UDim2.new(0, 10, 0, 80),
@@ -60,13 +65,12 @@ local CONFIG = {
     SaveFile    = "trubl_config.json",
 }
 
-local ScreenGui, MainFrame, ScrollingFrame
+local ScreenGui, MainFrame, ScrollingFrame, BtnGui
 local FpsLabel, PingLabel, TitleLabel
 local HeaderClickArea
-local ProgressFill, ProgressPct, ProgressRadLbl
+local ProgressFill, ProgressPct
 local NormalSpdBox, CarrySpdBox, LaggerSpdBox, LaggerCarrySpdBox
 local RadiusInput, AutoTPHeightBox
-local _btnsDraggable = false
 local speedMode = false
 local laggerToggled = false
 local laggerPhase = 0
@@ -92,6 +96,9 @@ local autoTPConn = nil
 local Conns = { antiRag = nil, batCounter = nil, anchor = {}, progress = nil }
 local autoBatSetVisual, setBatCounterVisual, setInfJumpVisual, setAntiRagVisual, setMedusaVisual
 local setAutoTPVisual, setStretchRezVisual, setAntiLagVisual
+local _btnRefs = {}
+local _btnPositions = {}
+
 local KB = {
     LaggerToggle = { kb = Enum.KeyCode.R, gp = nil },
     SpeedToggle  = { kb = Enum.KeyCode.Q, gp = nil },
@@ -144,6 +151,7 @@ local function toggleCarryMode()
     else
         speedMode = not speedMode
     end
+    if _btnRefs["carry"] then _btnRefs["carry"].setOn(speedMode) end
 end
 local function toggleLaggerMode()
     if not laggerToggled then
@@ -155,6 +163,7 @@ local function toggleLaggerMode()
     else
         laggerPhase = 2
     end
+    if _btnRefs["lagger"] then _btnRefs["lagger"].setOn(laggerToggled) end
 end
 local function getActiveMoveSpeed()
     return laggerToggled
@@ -181,6 +190,7 @@ local function saveConfig()
         stretchRez = stretchRezEnabled,
         autoTPEnabled = autoTPEnabled,
         autoTPHeight = autoTPHeight,
+        btnPositions = _btnPositions,
     }
     if writefile then
         pcall(function() writefile(CONFIG.SaveFile, HttpService:JSONEncode(cfg)) end)
@@ -464,6 +474,7 @@ local function stopBatCounter()
 end
 local function enableAutoBat()
     autoBatEnabled = true
+    if _btnRefs["bat"] then _btnRefs["bat"].setOn(true) end
 end
 local function disableAutoBat()
     autoBatEnabled = false
@@ -472,6 +483,7 @@ local function disableAutoBat()
         local hum2 = char:FindFirstChildOfClass("Humanoid")
         if hum2 then hum2.AutoRotate = true end
     end
+    if _btnRefs["bat"] then _btnRefs["bat"].setOn(false) end
 end
 local function cursedInstaReset()
     local character = LocalPlayer.Character
@@ -504,11 +516,6 @@ RunService.RenderStepped:Connect(function()
         local spd = getActiveMoveSpeed()
         if md.Magnitude > 0 then
             hrp.Velocity = Vector3.new(md.X * spd, hrp.Velocity.Y, md.Z * spd)
-        elseif antiRagdollEnabled then
-            local anyHeld = false
-            for _, key in ipairs({Enum.KeyCode.W, Enum.KeyCode.A, Enum.KeyCode.S, Enum.KeyCode.D}) do
-                if UserInputService:IsKeyDown(key) then anyHeld = true; break end
-            end
         end
     end
 end)
@@ -628,14 +635,8 @@ local function createRow(parent, layoutOrder, name, subTitle, strokeColor, hasCh
     if onToggle then
         clickBtn.MouseButton1Click:Connect(onToggle)
     end
-    local chevHolder, chevBtn
+    local chevBtn
     if hasChevron then
-        chevHolder = Instance.new("Frame", row)
-        chevHolder.Name = "ChevronHolder"
-        chevHolder.ZIndex = 6
-        chevHolder.Position = UDim2.new(1, -36, 0, 0)
-        chevHolder.Size = UDim2.new(0, 36, 0, 42)
-        chevHolder.BackgroundTransparency = 1
         chevBtn = Instance.new("TextButton", row)
         chevBtn.Name = "ChevronBtn"
         chevBtn.ZIndex = 7
@@ -730,12 +731,191 @@ local function createKeybindButton(parent, defaultText, zIndex)
     stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     return btn
 end
+
+local function buildCircleButtons()
+    local C = CONFIG.Colors
+    local gui = Instance.new("ScreenGui")
+    gui.Name = CONFIG.Names.BtnGui
+    gui.ResetOnSpawn = false
+    pcall(function() gui.IgnoreGuiInset = true end)
+    pcall(function() gui.Parent = game:GetService("CoreGui") end)
+    if not gui.Parent then gui.Parent = LocalPlayer.PlayerGui end
+    BtnGui = gui
+
+    local SZ = CONFIG.Size.BtnSize
+    local DARK = C.BtnInactive
+    local BLUE = C.ActiveMode
+    local BLUEON = C.RowStrokeOn
+    local WHITE = C.Text
+    local ACTIVE = C.BtnActive
+    local KILL = C.KillColor
+
+    local defs = {
+        {label="CARRY\nSPD", key="carry", pos=UDim2.new(1,-210,0,80), hasKill=true},
+        {label="LAGGER", key="lagger", pos=UDim2.new(1,-310,0,80), hasKill=true},
+        {label="BAT\nAIMBOT", key="bat", pos=UDim2.new(1,-410,0,80), hasKill=false},
+        {label="AUTO\nTP", key="autoTP", pos=UDim2.new(1,-210,0,190), hasKill=true},
+        {label="TP\nDOWN", key="tpDown", pos=UDim2.new(1,-310,0,190), hasKill=false},
+        {label="INSTA\nRESET", key="instaReset", pos=UDim2.new(1,-410,0,190), hasKill=false},
+    }
+
+    for _, def in ipairs(defs) do
+        local btn = Instance.new("TextButton", gui)
+        btn.Size = UDim2.new(0, SZ, 0, SZ)
+        btn.Position = def.pos
+        btn.BackgroundColor3 = DARK
+        btn.BorderSizePixel = 0
+        btn.Text = def.label
+        btn.TextColor3 = WHITE
+        btn.Font = Enum.Font.GothamBlack
+        btn.TextSize = 13
+        btn.TextWrapped = true
+        btn.AutoButtonColor = false
+        btn.ZIndex = 12
+
+        local corner = Instance.new("UICorner", btn)
+        corner.CornerRadius = UDim.new(1, 0)
+
+        local stroke = Instance.new("UIStroke", btn)
+        stroke.Color = BLUE
+        stroke.Thickness = 3
+        stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+        local killDot = nil
+        if def.hasKill then
+            killDot = Instance.new("Frame", btn)
+            killDot.Name = "KillDot"
+            killDot.ZIndex = 14
+            killDot.Size = UDim2.new(0, 14, 0, 14)
+            killDot.Position = UDim2.new(1, -16, 0, 2)
+            killDot.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            killDot.BorderSizePixel = 0
+            Instance.new("UICorner", killDot).CornerRadius = UDim.new(1, 0)
+            local killBtn = Instance.new("TextButton", killDot)
+            killBtn.Size = UDim2.new(1, 0, 1, 0)
+            killBtn.BackgroundTransparency = 1
+            killBtn.Text = "✕"
+            killBtn.TextColor3 = Color3.fromRGB(160, 160, 160)
+            killBtn.TextSize = 9
+            killBtn.Font = Enum.Font.GothamBold
+            killBtn.ZIndex = 15
+            killBtn.AutoButtonColor = false
+            killBtn.MouseButton1Click:Connect(function()
+                if def.key == "carry" then
+                    if speedMode then toggleCarryMode() end
+                    if _btnRefs["carry"] then _btnRefs["carry"].setOn(false) end
+                elseif def.key == "lagger" then
+                    if laggerToggled then
+                        laggerToggled = false
+                        laggerPhase = 0
+                        if _btnRefs["lagger"] then _btnRefs["lagger"].setOn(false) end
+                    end
+                elseif def.key == "autoTP" then
+                    autoTPEnabled = false
+                    stopAutoTP()
+                    if _btnRefs["autoTP"] then _btnRefs["autoTP"].setOn(false) end
+                    if setAutoTPVisual then setAutoTPVisual(false) end
+                end
+                saveConfig()
+            end)
+        end
+
+        local state = false
+        local function setOn(on)
+            state = on
+            TweenService:Create(btn, TweenInfo.new(0.12), {
+                BackgroundColor3 = on and ACTIVE or DARK
+            }):Play()
+            TweenService:Create(stroke, TweenInfo.new(0.12), {
+                Color = on and BLUEON or BLUE,
+                Thickness = on and 5 or 3
+            }):Play()
+            if killDot then
+                killDot.BackgroundColor3 = on and KILL or Color3.fromRGB(60, 60, 60)
+            end
+        end
+
+        _btnRefs[def.key] = {setOn = setOn, getState = function() return state end}
+
+        if _btnPositions[def.key] then
+            local p = _btnPositions[def.key]
+            btn.Position = UDim2.new(0, p.x, 0, p.y)
+        end
+
+        local dragging = false
+        local dragStart = nil
+        local startPos = nil
+
+        btn.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.MouseButton1
+            or inp.UserInputType == Enum.UserInputType.Touch then
+                dragging = true
+                dragStart = inp.Position
+                startPos = btn.Position
+                inp.Changed:Connect(function()
+                    if inp.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(inp)
+            if not dragging then return end
+            if inp.UserInputType == Enum.UserInputType.MouseMovement
+            or inp.UserInputType == Enum.UserInputType.Touch then
+                local dx = inp.Position.X - dragStart.X
+                local dy = inp.Position.Y - dragStart.Y
+                local newX = startPos.X.Offset + dx
+                local newY = startPos.Y.Offset + dy
+                btn.Position = UDim2.new(0, newX, 0, newY)
+            end
+        end)
+
+        btn.InputEnded:Connect(function(inp)
+            if inp.UserInputType ~= Enum.UserInputType.MouseButton1
+            and inp.UserInputType ~= Enum.UserInputType.Touch then return end
+            _btnPositions[def.key] = {x = btn.Position.X.Offset, y = btn.Position.Y.Offset}
+            saveConfig()
+        end)
+
+        btn.MouseButton1Click:Connect(function()
+            if def.key == "carry" then
+                toggleCarryMode()
+                saveConfig()
+            elseif def.key == "lagger" then
+                toggleLaggerMode()
+                saveConfig()
+            elseif def.key == "bat" then
+                if autoBatEnabled then
+                    disableAutoBat()
+                    if autoBatSetVisual then autoBatSetVisual(false) end
+                else
+                    enableAutoBat()
+                    if autoBatSetVisual then autoBatSetVisual(true) end
+                end
+            elseif def.key == "autoTP" then
+                autoTPEnabled = not autoTPEnabled
+                if autoTPEnabled then startAutoTP() else stopAutoTP() end
+                if _btnRefs["autoTP"] then _btnRefs["autoTP"].setOn(autoTPEnabled) end
+                if setAutoTPVisual then setAutoTPVisual(autoTPEnabled) end
+                saveConfig()
+            elseif def.key == "tpDown" then
+                runTPFloor()
+            elseif def.key == "instaReset" then
+                cursedInstaReset()
+            end
+        end)
+    end
+end
+
 local function createGUI()
     local C = CONFIG.Colors
     local old = game:GetService("CoreGui"):FindFirstChild(CONFIG.Names.ScreenGui)
     if old then old:Destroy() end
     local pg = LocalPlayer:FindFirstChild("PlayerGui")
     if pg then local o = pg:FindFirstChild(CONFIG.Names.ScreenGui); if o then o:Destroy() end end
+
     ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = CONFIG.Names.ScreenGui
     ScreenGui.IgnoreGuiInset = true
@@ -745,6 +925,7 @@ local function createGUI()
     if not pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end) then
         ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
     end
+
     MainFrame = Instance.new("Frame")
     MainFrame.Name = CONFIG.Names.MainFrame
     MainFrame.Visible = true
@@ -760,6 +941,7 @@ local function createGUI()
     mainStroke.Color = C.Stroke
     mainStroke.Thickness = 2
     mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
     do
         local guiDragging, guiDragStart, guiStartPos = false, nil, nil
         MainFrame.InputBegan:Connect(function(input)
@@ -785,6 +967,7 @@ local function createGUI()
             end
         end)
     end
+
     local ProgressBarContainer = Instance.new("Frame")
     ProgressBarContainer.Name = "ProgressBarContainer"
     ProgressBarContainer.ZIndex = 5
@@ -802,6 +985,15 @@ local function createGUI()
     ProgressFill.BorderSizePixel = 0
     ProgressFill.Parent = ProgressBarContainer
     Instance.new("UICorner", ProgressFill).CornerRadius = UDim.new(0, 10)
+    ProgressPct = Instance.new("TextLabel", ProgressBarContainer)
+    ProgressPct.ZIndex = 7
+    ProgressPct.Size = UDim2.new(1, 0, 1, 0)
+    ProgressPct.BackgroundTransparency = 1
+    ProgressPct.Text = "0%"
+    ProgressPct.TextColor3 = C.Text
+    ProgressPct.TextSize = 10
+    ProgressPct.Font = Enum.Font.GothamBold
+
     ScrollingFrame = Instance.new("ScrollingFrame")
     ScrollingFrame.Name = "ScrollingFrame"
     ScrollingFrame.Active = true
@@ -812,14 +1004,16 @@ local function createGUI()
     ScrollingFrame.BorderSizePixel = 0
     ScrollingFrame.ScrollBarThickness = 4
     ScrollingFrame.ScrollBarImageColor3 = C.ScrollBar
-    ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 1100)
+    ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
     ScrollingFrame.ScrollingEnabled = true
     ScrollingFrame.Parent = MainFrame
+
     local listLayout = Instance.new("UIListLayout")
     listLayout.Padding = UDim.new(0, 8)
     listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
     listLayout.Parent = ScrollingFrame
+
     local sfPadding = Instance.new("UIPadding")
     sfPadding.PaddingTop = UDim.new(0, 8)
     sfPadding.PaddingBottom = UDim.new(0, 10)
@@ -905,7 +1099,7 @@ local function createGUI()
 
     mkSection("COMBAT", 5)
     do
-        local sv, row, stroke, subPanel = mkToggleRow("Bat Aimbot", nil, C.RowStrokeOn, 6, function(on)
+        local sv, _, _, subPanel = mkToggleRow("Bat Aimbot", nil, C.RowStrokeOn, 6, function(on)
             if on then enableAutoBat() else disableAutoBat() end
             if autoBatSetVisual then autoBatSetVisual(on) end
             saveConfig()
@@ -918,10 +1112,10 @@ local function createGUI()
         spamBtn.ZIndex = 7
         spamBtn.Position = UDim2.new(0, 46, 0, 14)
         spamBtn.Size = UDim2.new(0, 44, 0, 24)
-        spamBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+        spamBtn.BackgroundColor3 = C.BtnActive
         spamBtn.BorderSizePixel = 0
         spamBtn.Text = "Spam"
-        spamBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        spamBtn.TextColor3 = C.Text
         spamBtn.TextSize = 9
         spamBtn.Font = Enum.Font.GothamBold
         spamBtn.AutoButtonColor = false
@@ -981,10 +1175,10 @@ local function createGUI()
         singleBtn.ZIndex = 7
         singleBtn.Position = UDim2.new(0, 54, 0, 14)
         singleBtn.Size = UDim2.new(0, 34, 0, 24)
-        singleBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+        singleBtn.BackgroundColor3 = C.BtnActive
         singleBtn.BorderSizePixel = 0
         singleBtn.Text = "Single"
-        singleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        singleBtn.TextColor3 = C.Text
         singleBtn.TextSize = 9
         singleBtn.Font = Enum.Font.GothamBold
         singleBtn.AutoButtonColor = false
@@ -1008,6 +1202,7 @@ local function createGUI()
         local sv, _, _, subPanel = mkToggleRow("Auto TP", nil, C.RowStrokeOff, 13, function(on)
             autoTPEnabled = on
             if on then startAutoTP() else stopAutoTP() end
+            if _btnRefs["autoTP"] then _btnRefs["autoTP"].setOn(on) end
             if setAutoTPVisual then setAutoTPVisual(on) end
             saveConfig()
         end, true)
@@ -1212,6 +1407,7 @@ local function loadConfigKeys()
     if cfg.laggerCarrySpeed then LAGGER_CARRY_SPEED = cfg.laggerCarrySpeed end
     if cfg.grabRadius then Steal.StealRadius = cfg.grabRadius end
     if cfg.autoTPHeight then autoTPHeight = cfg.autoTPHeight end
+    if cfg.btnPositions then _btnPositions = cfg.btnPositions end
 end
 local function loadConfigState()
     local cfg = _savedCfg
@@ -1230,13 +1426,16 @@ local function loadConfigState()
         if cfg.batCounter then batCounterEnabled = true; if setBatCounterVisual then setBatCounterVisual(true) end; startBatCounter() end
         if cfg.laggerMode then laggerToggled = true; speedMode = false; laggerPhase = cfg.laggerCarryMode and 2 or 1 end
         if cfg.carryMode then speedMode = true end
-        if cfg.autoTPEnabled then autoTPEnabled = true; if setAutoTPVisual then setAutoTPVisual(true) end; startAutoTP() end
-        if cfg.autoBat then autoBatEnabled = true; if autoBatSetVisual then autoBatSetVisual(true) end; enableAutoBat() end
+        if cfg.autoTPEnabled then autoTPEnabled = true; if _btnRefs["autoTP"] then _btnRefs["autoTP"].setOn(true) end; if setAutoTPVisual then setAutoTPVisual(true) end; startAutoTP() end
+        if cfg.autoBat then autoBatEnabled = true; if _btnRefs["bat"] then _btnRefs["bat"].setOn(true) end; if autoBatSetVisual then autoBatSetVisual(true) end; enableAutoBat() end
         if cfg.antiLag then enableAntiLag(); if setAntiLagVisual then setAntiLagVisual(true) end end
         if cfg.stretchRez then enableStretchRez(); if setStretchRezVisual then setStretchRezVisual(true) end end
+        if cfg.carryMode and _btnRefs["carry"] then _btnRefs["carry"].setOn(true) end
+        if cfg.laggerMode and _btnRefs["lagger"] then _btnRefs["lagger"].setOn(true) end
     end)
 end
 repeat task.wait() until game:IsLoaded()
 loadConfigKeys()
 createGUI()
+buildCircleButtons()
 loadConfigState()
