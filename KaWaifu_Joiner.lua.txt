@@ -1,0 +1,342 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local WIN_X = 200
+local WIN_Y = 100
+local WIN_W = 620
+local WIN_H = 480
+local CLR = {
+    bg         = Color3.fromRGB(26, 30, 42),
+    panel      = Color3.fromRGB(33, 37, 53),
+    panel2     = Color3.fromRGB(37, 42, 58),
+    border     = Color3.fromRGB(46, 52, 72),
+    accent     = Color3.fromRGB(224, 90, 122),
+    green      = Color3.fromRGB(61, 186, 110),
+    green_dark = Color3.fromRGB(46, 160, 90),
+    text       = Color3.fromRGB(208, 212, 232),
+    text_dim   = Color3.fromRGB(122, 132, 168),
+    gold       = Color3.fromRGB(240, 192, 96),
+    blue       = Color3.fromRGB(96, 176, 240),
+    row_hover  = Color3.fromRGB(42, 48, 72),
+    row_locked = Color3.fromRGB(45, 36, 53),
+    row_normal = Color3.fromRGB(37, 44, 58),
+    white      = Color3.fromRGB(255, 255, 255),
+}
+local brainrots = {
+    { name = "Capitano Moby",   tier = "Gold",    gen = "1.1B/s",    elapsed = 64,  locked = true  },
+    { name = "La Casa Boo",     tier = "Normal",  gen = "300M/s",    elapsed = 40,  locked = false },
+    { name = "Celestial Pegasus", tier = "Diamond", gen = "262.5M/s", elapsed = 71,  locked = false },
+    { name = "Cerberus",        tier = "Normal",  gen = "175M/s",    elapsed = 95,  locked = true  },
+    { name = "Rosey and Teddy", tier = "Normal",  gen = "165M/s",    elapsed = 105, locked = false },
+}
+local TIER_CLR = {
+    Gold    = Color3.fromRGB(240, 192, 96),
+    Diamond = Color3.fromRGB(96, 176, 240),
+    Normal  = Color3.fromRGB(122, 132, 168),
+}
+local visible       = true
+local autoJoin      = false
+local dragging      = false
+local dragOffX      = 0
+local dragOffY      = 0
+local hoveredRow    = -1
+local toastText     = ""
+local toastAlpha    = 0
+local toastTimer    = 0
+local joinCooldown  = {}  -- per-row cooldown
+local rejoinCooldown = 0
+local drawings = {}
+local function newDraw(class, props)
+    local d = Drawing.new(class)
+    for k, v in pairs(props) do
+        d[k] = v
+    end
+    d.Visible = true
+    table.insert(drawings, d)
+    return d
+end
+local function clearDrawings()
+    for _, d in ipairs(drawings) do
+        pcall(function() d:Remove() end)
+    end
+    drawings = {}
+end
+local function rect(x, y, w, h, color, alpha, filled, thickness)
+    return newDraw("Square", {
+        Position  = Vector2.new(x, y),
+        Size      = Vector2.new(w, h),
+        Color     = color,
+        Transparency = alpha or 1,
+        Filled    = filled ~= false,
+        Thickness = thickness or 1,
+    })
+end
+local function text(str, x, y, size, color, alpha, center)
+    return newDraw("Text", {
+        Text         = tostring(str),
+        Position     = Vector2.new(x, y),
+        Size         = size or 14,
+        Color        = color or CLR.text,
+        Transparency = alpha or 1,
+        Center       = center or false,
+        Outline      = false,
+    })
+end
+local function line(x1, y1, x2, y2, color, thick, alpha)
+    return newDraw("Line", {
+        From         = Vector2.new(x1, y1),
+        To           = Vector2.new(x2, y2),
+        Color        = color or CLR.border,
+        Thickness    = thick or 1,
+        Transparency = alpha or 1,
+    })
+end
+local function isInside(mx, my, x, y, w, h)
+    return mx >= x and mx <= x + w and my >= y and my <= y + h
+end
+local function showToast(msg)
+    toastText  = msg
+    toastAlpha = 1
+    toastTimer = 2.5
+end
+local function drawUI()
+    clearDrawings()
+    if not visible then return end
+    local X, Y = WIN_X, WIN_Y
+    local W, H = WIN_W, WIN_H
+    ----- WINDOW BACKGROUND -----
+    rect(X, Y, W, H, CLR.bg, 1)
+    rect(X, Y, W, H, CLR.border, 1, false, 1)
+    ----- TITLEBAR -----
+    local TB_H = 40
+    rect(X, Y, W, TB_H, CLR.panel, 1)
+    line(X, Y + TB_H, X + W, Y + TB_H, CLR.border, 1, 1)
+    -- 🌸 icon + title
+    text("🌸 KaWaifu Joiner", X + 12, Y + 12, 15, CLR.white, 1)
+    text("v2.7", X + 162, Y + 14, 11, CLR.text_dim, 1)
+    -- LIVE badge
+    rect(X + 190, Y + 11, 46, 18, CLR.bg, 1)
+    rect(X + 190, Y + 11, 46, 18, CLR.green, 1, false, 1)
+    text("● Live", X + 193, Y + 14, 11, CLR.green, 1)
+    -- discord link
+    text("discord.gg/kawaifu-notifier", X + 260, Y + 14, 11, CLR.text_dim, 1)
+    -- window buttons
+    rect(X + W - 72, Y + 7, 28, 26, CLR.panel2, 1)
+    text("─", X + W - 65, Y + 14, 13, CLR.text_dim, 1)
+    rect(X + W - 38, Y + 7, 28, 26, CLR.accent, 1)
+    text("✕", X + W - 30, Y + 14, 13, CLR.white, 1)
+    ----- SIDEBAR -----
+    local SB_W = 72
+    rect(X, Y + TB_H, SB_W, H - TB_H, Color3.fromRGB(22, 26, 38), 1)
+    line(X + SB_W, Y + TB_H, X + SB_W, Y + H, CLR.border, 1, 1)
+    local navItems = {
+        { icon = "🔍", label = "Main",      active = true  },
+        { icon = "📋", label = "Whitelist", active = false },
+        { icon = "⚙",  label = "Config",    active = false },
+        { icon = "👤", label = "AJ Users",  active = false },
+    }
+    for i, item in ipairs(navItems) do
+        local ny = Y + TB_H + (i - 1) * 70 + 10
+        if item.active then
+            rect(X + 4, ny, SB_W - 8, 58, CLR.panel, 1)
+        end
+        text(item.icon, X + 22, ny + 8,  18, CLR.white, 1)
+        text(item.label, X + 8,  ny + 34, 11, item.active and CLR.accent or CLR.text_dim, 1)
+    end
+    ----- MAIN CONTENT -----
+    local CX = X + SB_W + 10
+    local CW = W - SB_W - 20
+    local CY = Y + TB_H + 10
+    -- Search box
+    rect(CX, CY, CW - 110, 34, Color3.fromRGB(22, 26, 38), 1)
+    rect(CX, CY, CW - 110, 34, CLR.border, 1, false, 1)
+    text("Search brainrots...", CX + 12, CY + 10, 13, CLR.text_dim, 1)
+    -- Rejoin button
+    local rejoinColor = rejoinCooldown > 0 and Color3.fromRGB(160, 60, 80) or CLR.accent
+    rect(CX + CW - 104, CY, 100, 34, rejoinColor, 1)
+    text(rejoinCooldown > 0 and "Rejoining..." or "Rejoin", CX + CW - 82, CY + 10, 13, CLR.white, 1)
+    -- Settings + AutoJoin row
+    local MY = CY + 44
+    rect(CX, MY, CW - 140, 32, CLR.panel2, 1)
+    rect(CX, MY, CW - 140, 32, CLR.border, 1, false, 1)
+    text("⚙ Settings ▸", CX + 12, MY + 9, 13, CLR.text, 1)
+    local AX = CX + CW - 134
+    rect(AX, MY, 130, 32, CLR.panel2, 1)
+    rect(AX, MY, 130, 32, CLR.border, 1, false, 1)
+    text("AUTO JOIN", AX + 8, MY + 10, 11, CLR.text_dim, 1)
+    line(AX + 82, MY, AX + 82, MY + 32, CLR.border, 1, 1)
+    local ajColor = autoJoin and CLR.green or CLR.accent
+    rect(AX + 84, MY + 2, 44, 28, ajColor, 1)
+    text(autoJoin and "ON" or "OFF", AX + 96, MY + 9, 12, CLR.white, 1)
+    -- Table header
+    local HY = MY + 42
+    text("ELAPSED",      CX,        HY, 11, CLR.text_dim, 1)
+    text("BRAINROT NAME",CX + 80,   HY, 11, CLR.text_dim, 1)
+    text("GENERATION",   CX + CW - 200, HY, 11, CLR.text_dim, 1)
+    -- Rows
+    local ROW_H = 48
+    local ROW_Y = HY + 20
+    for i, row in ipairs(brainrots) do
+        local ry = ROW_Y + (i - 1) * (ROW_H + 6)
+        local rowColor = (hoveredRow == i) and CLR.row_hover
+                       or (row.locked and CLR.row_locked or CLR.row_normal)
+        rect(CX, ry, CW, ROW_H, rowColor, 1)
+        -- left accent bar
+        local barColor = row.locked and CLR.accent or CLR.green
+        rect(CX, ry, 3, ROW_H, barColor, 1)
+        -- elapsed
+        text(row.elapsed .. "s", CX + 8, ry + 16, 13, CLR.text_dim, 1)
+        -- name
+        text(row.name, CX + 75, ry + 16, 15, CLR.text, 1)
+        -- tier badge
+        local nameW = #row.name * 8
+        local bx = CX + 75 + nameW + 6
+        local bColor = TIER_CLR[row.tier] or CLR.text_dim
+        rect(bx, ry + 14, #row.tier * 7 + 10, 18, Color3.fromRGB(20, 24, 36), 1)
+        rect(bx, ry + 14, #row.tier * 7 + 10, 18, bColor, 1, false, 1)
+        text(row.tier, bx + 5, ry + 17, 11, bColor, 1)
+        -- generation
+        local genColor = (i == 1) and CLR.gold or CLR.text_dim
+        text(row.gen, CX + CW - 196, ry + 16, 14, genColor, 1)
+        -- lock X
+        if row.locked then
+            text("✕", CX + CW - 100, ry + 16, 14, CLR.accent, 1)
+        end
+        -- JOIN button
+        local cooldown = joinCooldown[i] or 0
+        local jColor = cooldown > 0 and CLR.green_dark or CLR.green
+        rect(CX + CW - 88, ry + 8, 84, 32, jColor, 1)
+        text(cooldown > 0 and "Joining..." or "JOIN", CX + CW - 70, ry + 17, 13, CLR.white, 1)
+    end
+    -- TOAST
+    if toastAlpha > 0 then
+        local TW = 260
+        local TX = X + W / 2 - TW / 2
+        local TY = Y + H - 50
+        rect(TX, TY, TW, 34, CLR.panel, toastAlpha)
+        rect(TX, TY, TW, 34, CLR.green, toastAlpha, false, 1)
+        text(toastText, TX + TW / 2, TY + 10, 13, CLR.green, toastAlpha, true)
+    end
+end
+local inputConn = UserInputService.InputBegan:Connect(function(input, gpe)
+    if not visible then return end
+    if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+    local mx = input.Position.X
+    local my = input.Position.Y
+    local X, Y = WIN_X, WIN_Y
+    -- Titlebar drag
+    if isInside(mx, my, X, Y, WIN_W - 80, 40) then
+        dragging = true
+        dragOffX = mx - X
+        dragOffY = my - Y
+        return
+    end
+    -- Close button
+    if isInside(mx, my, X + WIN_W - 38, Y + 7, 28, 26) then
+        visible = false
+        clearDrawings()
+        return
+    end
+    -- Rejoin button
+    local CX = X + 72 + 10
+    local CW = WIN_W - 72 - 20
+    local CY = Y + 40 + 10
+    if isInside(mx, my, CX + CW - 104, CY, 100, 34) then
+        if rejoinCooldown <= 0 then
+            rejoinCooldown = 1.5
+            showToast("↺ Rejoining server...")
+        end
+        return
+    end
+    -- AutoJoin toggle
+    local MY = CY + 44
+    local AX = CX + CW - 134
+    if isInside(mx, my, AX + 84, MY + 2, 44, 28) then
+        autoJoin = not autoJoin
+        showToast("AUTO JOIN " .. (autoJoin and "enabled ✓" or "disabled"))
+        return
+    end
+    -- JOIN buttons
+    local HY = MY + 42
+    local ROW_H = 48
+    local ROW_Y = HY + 20
+    for i, row in ipairs(brainrots) do
+        local ry = ROW_Y + (i - 1) * (ROW_H + 6)
+        if isInside(mx, my, CX + CW - 88, ry + 8, 84, 32) then
+            if (joinCooldown[i] or 0) <= 0 then
+                joinCooldown[i] = 1.8
+                showToast("✓ Joined: " .. row.name)
+                -- Auto rejoin after join
+                task.delay(1.4, function()
+                    rejoinCooldown = 1.5
+                    showToast("↺ Rejoining server...")
+                end)
+            end
+            return
+        end
+    end
+end)
+local inputEndConn = UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+local renderConn = RunService.RenderStepped:Connect(function(dt)
+    if not visible then return end
+    -- Dragging
+    if dragging then
+        local mp = UserInputService:GetMouseLocation()
+        WIN_X = mp.X - dragOffX
+        WIN_Y = mp.Y - dragOffY
+    end
+    -- Hover detection
+    local mp = UserInputService:GetMouseLocation()
+    local mx, my = mp.X, mp.Y
+    local X, Y = WIN_X, WIN_Y
+    local CX = X + 72 + 10
+    local CW = WIN_W - 72 - 20
+    local CY = Y + 40 + 10
+    local MY = CY + 44
+    local HY = MY + 42
+    local ROW_H = 48
+    local ROW_Y = HY + 20
+    local newHover = -1
+    for i = 1, #brainrots do
+        local ry = ROW_Y + (i - 1) * (ROW_H + 6)
+        if isInside(mx, my, CX, ry, CW, ROW_H) then
+            newHover = i
+            break
+        end
+    end
+    hoveredRow = newHover
+    -- Elapsed timers
+    for _, row in ipairs(brainrots) do
+        row.elapsed = row.elapsed + dt
+    end
+    -- Cooldowns
+    for i in pairs(joinCooldown) do
+        joinCooldown[i] = joinCooldown[i] - dt
+        if joinCooldown[i] <= 0 then joinCooldown[i] = nil end
+    end
+    if rejoinCooldown > 0 then
+        rejoinCooldown = rejoinCooldown - dt
+    end
+    -- Toast fade
+    if toastTimer > 0 then
+        toastTimer = toastTimer - dt
+        if toastTimer <= 0.5 then
+            toastAlpha = math.max(0, toastTimer / 0.5)
+        end
+    end
+    drawUI()
+end)
+_G.KawaifuCleanup = function()
+    renderConn:Disconnect()
+    inputConn:Disconnect()
+    inputEndConn:Disconnect()
+    clearDrawings()
+    print("[KaWaifu] UI temizlendi.")
+end
+print("[KaWaifu Joiner v2.7] Yuklendi! Temizlemek icin _G.KawaifuCleanup() calistir.")
